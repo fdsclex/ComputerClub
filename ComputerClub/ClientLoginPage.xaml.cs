@@ -10,7 +10,16 @@ namespace ComputerClub
 {
     public partial class ClientLoginPage : Page
     {
-        private bool isPasswordVisible = false;
+        // DependencyProperty для триггера в стиле глазика
+        public static readonly DependencyProperty IsPasswordVisibleProperty =
+            DependencyProperty.Register(nameof(IsPasswordVisible), typeof(bool), typeof(ClientLoginPage), new PropertyMetadata(false));
+
+        public bool IsPasswordVisible
+        {
+            get => (bool)GetValue(IsPasswordVisibleProperty);
+            set => SetValue(IsPasswordVisibleProperty, value);
+        }
+
         private int failedAttemptsCount = 0;
         private string currentCaptcha = "";
 
@@ -22,7 +31,7 @@ namespace ComputerClub
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string phone = tbPhone.Text.Trim();
-            string password = isPasswordVisible ? tbPasswordVisible.Text : pbPassword.Password;
+            string password = IsPasswordVisible ? tbPasswordVisible.Text : pbPassword.Password;
 
             if (string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(password))
             {
@@ -33,7 +42,7 @@ namespace ComputerClub
             using (var ctx = new Entities())
             {
                 var client = ctx.Clients.FirstOrDefault(c => c.Phone == phone);
-                if (client != null && PasswordHelper.VerifyPassword(password, client.Password))  // ← вернул хеширование
+                if (client != null && PasswordHelper.VerifyPassword(password, client.Password))
                 {
                     AppConfig.CurrentClientId = client.ClientID;
                     failedAttemptsCount = 0;
@@ -63,7 +72,6 @@ namespace ComputerClub
             }
         }
 
-        // Остальные методы остаются без изменений
         private void GenerateCaptcha()
         {
             captchaCanvas.Children.Clear();
@@ -161,7 +169,29 @@ namespace ComputerClub
             }
         }
 
-        // Остальные методы (маска телефона, переключение пароля, ссылки) остаются без изменений
+        // Переключение видимости пароля (без изменения Content — стиль сам сделает)
+        private void TogglePassword_Click(object sender, RoutedEventArgs e)
+        {
+            IsPasswordVisible = !IsPasswordVisible;
+
+            if (IsPasswordVisible)
+            {
+                tbPasswordVisible.Text = pbPassword.Password;
+                pbPassword.Visibility = Visibility.Collapsed;
+                tbPasswordVisible.Visibility = Visibility.Visible;
+                tbPasswordVisible.Focus();
+                tbPasswordVisible.CaretIndex = tbPasswordVisible.Text.Length;
+            }
+            else
+            {
+                pbPassword.Password = tbPasswordVisible.Text;
+                tbPasswordVisible.Visibility = Visibility.Collapsed;
+                pbPassword.Visibility = Visibility.Visible;
+                pbPassword.Focus();
+            }
+        }
+
+        // Остальные методы остаются без изменений
         private void Phone_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             if (e.Text.Length > 0 && !char.IsDigit(e.Text[0]))
@@ -207,27 +237,6 @@ namespace ComputerClub
                 caretIndex = Math.Max(3, Math.Min(caretIndex, formatted.Length));
                 textBox.CaretIndex = caretIndex;
                 textBox.SelectionLength = 0;
-            }
-        }
-
-        private void TogglePassword_Click(object sender, RoutedEventArgs e)
-        {
-            isPasswordVisible = !isPasswordVisible;
-
-            if (isPasswordVisible)
-            {
-                tbPasswordVisible.Text = pbPassword.Password;
-                pbPassword.Visibility = Visibility.Collapsed;
-                tbPasswordVisible.Visibility = Visibility.Visible;
-                tbPasswordVisible.Focus();
-                tbPasswordVisible.CaretIndex = tbPasswordVisible.Text.Length;
-            }
-            else
-            {
-                pbPassword.Password = tbPasswordVisible.Text;
-                tbPasswordVisible.Visibility = Visibility.Collapsed;
-                pbPassword.Visibility = Visibility.Visible;
-                pbPassword.Focus();
             }
         }
 

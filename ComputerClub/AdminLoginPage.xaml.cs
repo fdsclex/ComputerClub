@@ -6,7 +6,15 @@ namespace ComputerClub
 {
     public partial class AdminLoginPage : Page
     {
-        private bool isPasswordVisible = false;
+        // DependencyProperty для триггера в стиле глазика
+        public static readonly DependencyProperty IsPasswordVisibleProperty =
+            DependencyProperty.Register(nameof(IsPasswordVisible), typeof(bool), typeof(AdminLoginPage), new PropertyMetadata(false));
+
+        public bool IsPasswordVisible
+        {
+            get => (bool)GetValue(IsPasswordVisibleProperty);
+            set => SetValue(IsPasswordVisibleProperty, value);
+        }
 
         public AdminLoginPage()
         {
@@ -18,8 +26,6 @@ namespace ComputerClub
             if (sender is TextBox tb)
             {
                 string text = tb.Text.Trim();
-
-                // Если ввели @ — убираем всё после него (чтобы не дублировалось)
                 int atIndex = text.IndexOf('@');
                 if (atIndex >= 0)
                 {
@@ -30,12 +36,11 @@ namespace ComputerClub
             }
         }
 
-        // В AdminLoginPage.xaml.cs
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string login = tbAdminLogin.Text.Trim();
             string fullEmail = login + "@club.ru";
-            string password = isPasswordVisible ? tbPasswordVisible.Text : pbPassword.Password;
+            string password = IsPasswordVisible ? tbPasswordVisible.Text : pbPassword.Password;
 
             if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
             {
@@ -46,7 +51,7 @@ namespace ComputerClub
             using (var ctx = new Entities())
             {
                 var employee = ctx.Employees.FirstOrDefault(emp => emp.Email == fullEmail);
-                if (employee != null && employee.Password == password)  // ← простое сравнение строк
+                if (employee != null && PasswordHelper.VerifyPassword(password, employee.Password))
                 {
                     NavigationService.Navigate(new AdminDashboardPage());
                 }
@@ -59,9 +64,9 @@ namespace ComputerClub
 
         private void TogglePassword_Click(object sender, RoutedEventArgs e)
         {
-            isPasswordVisible = !isPasswordVisible;
+            IsPasswordVisible = !IsPasswordVisible;
 
-            if (isPasswordVisible)
+            if (IsPasswordVisible)
             {
                 tbPasswordVisible.Text = pbPassword.Password;
                 pbPassword.Visibility = Visibility.Collapsed;
@@ -76,6 +81,7 @@ namespace ComputerClub
                 pbPassword.Visibility = Visibility.Visible;
                 pbPassword.Focus();
             }
+            // НЕ меняем Content — стиль сам переключит иконку
         }
     }
 }

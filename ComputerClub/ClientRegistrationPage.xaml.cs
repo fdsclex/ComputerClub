@@ -8,22 +8,39 @@ namespace ComputerClub
 {
     public partial class ClientRegistrationPage : Page
     {
-        private bool isMainPasswordVisible = false;   // по умолчанию СКРЫТО
-        private bool isConfirmPasswordVisible = false;
+        // DependencyProperty для первого глазика
+        public static readonly DependencyProperty IsMainPasswordVisibleProperty =
+            DependencyProperty.Register(nameof(IsMainPasswordVisible), typeof(bool), typeof(ClientRegistrationPage), new PropertyMetadata(false));
+
+        public bool IsMainPasswordVisible
+        {
+            get => (bool)GetValue(IsMainPasswordVisibleProperty);
+            set => SetValue(IsMainPasswordVisibleProperty, value);
+        }
+
+        // DependencyProperty для второго глазика
+        public static readonly DependencyProperty IsConfirmPasswordVisibleProperty =
+            DependencyProperty.Register(nameof(IsConfirmPasswordVisible), typeof(bool), typeof(ClientRegistrationPage), new PropertyMetadata(false));
+
+        public bool IsConfirmPasswordVisible
+        {
+            get => (bool)GetValue(IsConfirmPasswordVisibleProperty);
+            set => SetValue(IsConfirmPasswordVisibleProperty, value);
+        }
 
         public ClientRegistrationPage()
         {
             InitializeComponent();
-            UpdatePasswordVisibility();  // сразу скрываем пароли
+            UpdatePasswordVisibility();
         }
 
         private void UpdatePasswordVisibility()
         {
-            tbPassword.Visibility = isMainPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
-            pbPassword.Visibility = isMainPasswordVisible ? Visibility.Collapsed : Visibility.Visible;
+            tbPassword.Visibility = IsMainPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
+            pbPassword.Visibility = IsMainPasswordVisible ? Visibility.Collapsed : Visibility.Visible;
 
-            tbConfirmPassword.Visibility = isConfirmPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
-            pbConfirmPassword.Visibility = isConfirmPasswordVisible ? Visibility.Collapsed : Visibility.Visible;
+            tbConfirmPassword.Visibility = IsConfirmPasswordVisible ? Visibility.Visible : Visibility.Collapsed;
+            pbConfirmPassword.Visibility = IsConfirmPasswordVisible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
@@ -31,8 +48,8 @@ namespace ComputerClub
             string fullName = tbFullName.Text.Trim();
             string phone = tbPhone.Text.Trim();
             string email = tbEmail.Text.Trim();
-            string password = isMainPasswordVisible ? tbPassword.Text : pbPassword.Password;
-            string confirm = isConfirmPasswordVisible ? tbConfirmPassword.Text : pbConfirmPassword.Password;
+            string password = IsMainPasswordVisible ? tbPassword.Text : pbPassword.Password;
+            string confirm = IsConfirmPasswordVisible ? tbConfirmPassword.Text : pbConfirmPassword.Password;
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(phone) ||
                 string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirm))
@@ -102,55 +119,46 @@ namespace ComputerClub
         {
             NavigationService.Navigate(new ClientLoginPage());
         }
+
+        private void Phone_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text.Length > 0 && !char.IsDigit(e.Text[0]))
+                e.Handled = true;
+        }
+
         private void Phone_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
-                // Сохраняем позицию курсора ДО изменения
                 int caretIndex = textBox.CaretIndex;
-
-                // Только цифры
                 string raw = new string(textBox.Text.Where(char.IsDigit).ToArray());
 
-                // Убираем ведущую 7/8, если ввели
                 if (raw.StartsWith("7") || raw.StartsWith("8"))
                     raw = raw.Substring(1);
 
-                // Ограничиваем 10 цифр
                 if (raw.Length > 10)
                     raw = raw.Substring(0, 10);
 
-                // Форматируем
                 string formatted = "+7";
-
                 if (raw.Length > 0)
                     formatted += " (" + raw.Substring(0, Math.Min(3, raw.Length));
-
                 if (raw.Length > 3)
                     formatted += ") " + raw.Substring(3, Math.Min(3, raw.Length - 3));
-
                 if (raw.Length > 6)
                     formatted += "-" + raw.Substring(6, Math.Min(2, raw.Length - 6));
-
                 if (raw.Length > 8)
                     formatted += "-" + raw.Substring(8, Math.Min(2, raw.Length - 8));
 
                 if (textBox.Text == formatted)
                     return;
 
-                // Применяем новый текст
                 textBox.Text = formatted;
 
-                // Восстанавливаем курсор
-                // Если ввели первую цифру — сдвигаем на длину "+7 ("
-                if (caretIndex == 3 && raw.Length == 1) // после "+7" ввели первую цифру
-                {
-                    caretIndex = 6; // после "+7 ("
-                }
+                if (caretIndex == 3 && raw.Length == 1)
+                    caretIndex = 6;
                 else
                 {
-                    // Обычная логика
-                    int added = formatted.Length - (textBox.Text.Length - caretIndex);
+                    int added = formatted.Length - textBox.Text.Length + caretIndex;
                     caretIndex += added;
                 }
 
@@ -159,22 +167,12 @@ namespace ComputerClub
                 textBox.SelectionLength = 0;
             }
         }
-        // Маска телефона (оставил твою последнюю версию)
-        private void Phone_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            if (e.Text.Length > 0 && !char.IsDigit(e.Text[0]))
-                e.Handled = true;
-        }
 
-        
-
-        // Переключение ТОЛЬКО первого пароля
         private void TogglePassword1_Click(object sender, RoutedEventArgs e)
         {
-            isMainPasswordVisible = !isMainPasswordVisible;
+            IsMainPasswordVisible = !IsMainPasswordVisible;
             UpdatePasswordVisibility();
-
-            if (isMainPasswordVisible)
+            if (IsMainPasswordVisible)
             {
                 tbPassword.Text = pbPassword.Password;
                 tbPassword.Focus();
@@ -187,13 +185,11 @@ namespace ComputerClub
             }
         }
 
-        // Переключение ТОЛЬКО второго пароля
         private void TogglePassword2_Click(object sender, RoutedEventArgs e)
         {
-            isConfirmPasswordVisible = !isConfirmPasswordVisible;
+            IsConfirmPasswordVisible = !IsConfirmPasswordVisible;
             UpdatePasswordVisibility();
-
-            if (isConfirmPasswordVisible)
+            if (IsConfirmPasswordVisible)
             {
                 tbConfirmPassword.Text = pbConfirmPassword.Password;
                 tbConfirmPassword.Focus();

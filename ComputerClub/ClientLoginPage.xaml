@@ -28,9 +28,9 @@
             <StackPanel>
                 <TextBlock Text="Введите символы ниже" FontSize="16" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,15"/>
                 <Border Background="#2A2A2A" BorderBrush="#555555" BorderThickness="1" CornerRadius="6" Padding="15">
-                    <Canvas x:Name="captchaCanvas" Width="300" Height="80" ClipToBounds="True"/>
+                    <Canvas x:Name="captchaCanvas" Width="300" Height="100" ClipToBounds="True"/>
                 </Border>
-                <TextBox x:Name="tbCaptchaInput" Margin="0,15,0,0" Padding="10" FontSize="18" MaxLength="7" KeyDown="TbCaptchaInput_KeyDown"/>
+                <TextBox x:Name="tbCaptchaInput" Margin="0,15,0,0" Padding="10" FontSize="15" MaxLength="7" KeyDown="TbCaptchaInput_KeyDown"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
                     <Button Content="Подтвердить" Width="140" Margin="0,0,20,0" Click="ConfirmCaptcha_Click"/>
                     <Button Content="Обновить" Width="100" Click="RefreshCaptcha_Click"/>
