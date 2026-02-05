@@ -1,0 +1,18 @@
+﻿<Page x:Class="ComputerClub.RoleSelectionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Я администратор"
+                    Style="{StaticResource YellowActionButton}"
+                    Width="320" Height="70" Margin="0,0,0,30"
+                    Click="AdminButton_Click"/>
+
+            <Button Content="Я клиент"
+                    Style="{StaticResource YellowActionButton}"
+                    Width="320" Height="70"
+                    Click="ClientButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

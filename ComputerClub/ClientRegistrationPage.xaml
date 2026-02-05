@@ -1,0 +1,72 @@
+﻿<Page x:Class="ComputerClub.ClientRegistrationPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:ComputerClub">
+    <Grid Margin="40">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Width="400" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Регистрация клиента"
+                           FontSize="26" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentYellow}"
+                           HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                <TextBlock Text="ФИО" Style="{StaticResource FieldLabel}"/>
+                <TextBox x:Name="tbFullName" />
+                <TextBlock Text="Номер телефона" Style="{StaticResource FieldLabel}"/>
+                <TextBox x:Name="tbPhone"
+                         Text="+7"
+                         MaxLength="18"
+                         PreviewTextInput="Phone_PreviewTextInput"
+                         TextChanged="Phone_TextChanged"/>
+                <TextBlock Text="Пол" Style="{StaticResource FieldLabel}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,16">
+                    <RadioButton x:Name="rbMale" Content="Мужской" Margin="0,0,30,0" GroupName="Gender" Style="{StaticResource GenderRadioButton}"/>
+                    <RadioButton x:Name="rbFemale" Content="Женский" Margin="0,0,30,0" GroupName="Gender" Style="{StaticResource GenderRadioButton}"/>
+                </StackPanel>
+                <TextBlock Text="Email (необязательно)" Style="{StaticResource FieldLabel}"/>
+                <TextBox x:Name="tbEmail" />
+                <TextBlock Text="Пароль" Style="{StaticResource FieldLabel}"/>
+                <Grid>
+                    <PasswordBox x:Name="pbPassword"
+                 Style="{StaticResource DarkInput}"
+                 Padding="12,10,48,10"
+                 Visibility="Visible"/>
+                    <!-- по умолчанию видно (скрытый режим) -->
+
+                    <TextBox x:Name="tbPassword"
+             Style="{StaticResource DarkInput}"
+             Padding="12,10,48,10"
+             Visibility="Collapsed"/>
+                    <!-- по умолчанию скрыто -->
+
+                    <Button x:Name="btnTogglePassword1"
+            Style="{StaticResource PasswordToggleButton}"
+            Click="TogglePassword1_Click"/>
+                </Grid>
+                <TextBlock Text="Повторите пароль" Style="{StaticResource FieldLabel}"/>
+                <Grid>
+                    <PasswordBox x:Name="pbConfirmPassword"
+                 Style="{StaticResource DarkInput}"
+                 Padding="12,10,48,10"
+                 Visibility="Visible"/>
+
+                    <TextBox x:Name="tbConfirmPassword"
+             Style="{StaticResource DarkInput}"
+             Padding="12,10,48,10"
+             Visibility="Collapsed"/>
+
+                    <Button x:Name="btnTogglePassword2"
+            Style="{StaticResource PasswordToggleButton}"
+            Click="TogglePassword2_Click"/>
+                </Grid>
+                <Button Content="ЗАРЕГИСТРИРОВАТЬСЯ"
+                        Style="{StaticResource YellowActionButton}"
+                        Margin="0,24,0,16"
+                        Click="RegisterButton_Click"/>
+                <TextBlock Text="Уже зарегистрированы? Войти"
+                           Style="{StaticResource LinkStyle}"
+                           HorizontalAlignment="Center"
+                           MouseLeftButtonDown="LoginLink_MouseDown"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

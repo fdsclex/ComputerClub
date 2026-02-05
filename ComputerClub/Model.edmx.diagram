@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="16727c26b46249e58518e03060547698" Name="Diagram1">
+        <EntityTypeShape EntityType="ComputerClubDBModel.Clients" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.DeviceGames" Width="1.5" PointX="6" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Devices" Width="1.5" PointX="3.75" PointY="9.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Employees" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Games" Width="1.5" PointX="3.75" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.MenuItems" Width="1.5" PointX="6" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.OrderItems" Width="1.5" PointX="8.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Orders" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Reservations" Width="1.5" PointX="6" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Sessions" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Tariffs" Width="1.5" PointX="1.5" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Transactions" Width="1.5" PointX="11.25" PointY="5.125" IsExpanded="true" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Orders__ClientID__619B8048" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Reservati__Clien__4F7CD00D" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Sessions__Client__5535A963" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Transacti__Clien__6B24EA82" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__DeviceGam__Devic__49C3F6B7" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__DeviceGam__GameI__4AB81AF0" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Reservati__Devic__5070F446" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Sessions__Device__5629CD9C" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK_Devices_Tariffs" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Orders__Employee__628FA481" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Sessions__Employ__571DF1D5" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Transacti__Emplo__6C190EBB" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__OrderItem__MenuI__6754599E" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__OrderItem__Order__66603565" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Transacti__Order__6EF57B66" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Sessions__Reserv__59063A47" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Transacti__Reser__6E01572D" ManuallyRouted="false" />
+        <AssociationConnector Association="ComputerClubDBModel.FK__Transacti__Sessi__6D0D32F4" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

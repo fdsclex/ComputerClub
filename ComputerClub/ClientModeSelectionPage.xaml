@@ -1,0 +1,18 @@
+﻿<Page x:Class="ComputerClub.ClientModeSelectionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Удалённая бронь"
+                    Style="{StaticResource YellowActionButton}"
+                    Width="320" Height="70" Margin="0,0,0,30"
+                    Click="RemoteButton_Click"/>
+
+            <Button Content="Сессия на месте"
+                    Style="{StaticResource YellowActionButton}"
+                    Width="320" Height="70"
+                    Click="OnSiteButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

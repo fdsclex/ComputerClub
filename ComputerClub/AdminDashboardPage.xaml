@@ -1,0 +1,33 @@
+﻿<Page x:Class="ComputerClub.AdminDashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="40">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="Панель администратора" 
+                       FontSize="32" FontWeight="Bold" 
+                       Foreground="{StaticResource AccentYellow}"
+                       HorizontalAlignment="Center" Margin="0,0,0,40"/>
+
+            <Button Content="Управление ПК и тарифами" 
+                    Style="{StaticResource YellowActionButton}"
+                    Margin="0,0,0,20"
+                    Click="ManageDevices_Click"/>
+
+            <Button Content="Просмотр сессий и броней" 
+                    Style="{StaticResource YellowActionButton}"
+                    Margin="0,0,0,20"
+                    Click="ViewSessions_Click"/>
+
+            <Button Content="Управление меню и заказами" 
+                    Style="{StaticResource YellowActionButton}"
+                    Margin="0,0,0,20"
+                    Click="ManageMenu_Click"/>
+
+            <Button Content="Выход" 
+                    Style="{StaticResource YellowActionButton}"
+                    Background="#D32F2F" Foreground="White"
+                    Click="Logout_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>
