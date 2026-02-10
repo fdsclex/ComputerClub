@@ -51,7 +51,7 @@ namespace ComputerClub
             using (var ctx = new Entities())
             {
                 var employee = ctx.Employees.FirstOrDefault(emp => emp.Email == fullEmail);
-                if (employee != null && PasswordHelper.VerifyPassword(password, employee.Password))
+                if (employee != null && password == employee.Password)
                 {
                     NavigationService.Navigate(new AdminDashboardPage());
                 }

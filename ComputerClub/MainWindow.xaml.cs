@@ -14,12 +14,17 @@ namespace ComputerClub
         {
             InitializeComponent();
 
+            // Полноэкранный режим (киоск-режим)
+            this.WindowState = WindowState.Maximized;
+            this.WindowStyle = WindowStyle.None;
+            this.ResizeMode = ResizeMode.NoResize;
+            // this.Topmost = true;   // раскомментируй, если нужно всегда сверху (полный киоск)
+
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             timer.Tick += Timer_Tick;
             timer.Start();
 
             MainFrame.Navigated += MainFrame_Navigated;
-
             MainFrame.Navigate(new RoleSelectionPage());
         }
 
@@ -48,7 +53,9 @@ namespace ComputerClub
         private void UpdatePcNumberVisibility()
         {
             bool showPc = AppConfig.IsOnSite && AppConfig.DeviceNumber.HasValue &&
-                          (MainFrame.Content is ClientLoginPage || MainFrame.Content is ClientRegistrationPage || MainFrame.Content is ClientDashboardPage);
+                          (MainFrame.Content is ClientLoginPage ||
+                           MainFrame.Content is ClientRegistrationPage ||
+                           MainFrame.Content is ClientDashboardPage);
 
             tbPcNumber.Visibility = showPc ? Visibility.Visible : Visibility.Collapsed;
 
@@ -58,12 +65,13 @@ namespace ComputerClub
             }
         }
 
-        // Публичные методы для режима капчи
+        // Режим капчи (оставлен без изменений)
         public void EnterCaptchaMode()
         {
             btnBack.Visibility = Visibility.Collapsed;
             headerBorder.Visibility = Visibility.Collapsed;
             footerBorder.Visibility = Visibility.Collapsed;
+            // В режиме капчи уже нет рамки, но на всякий случай
             this.WindowStyle = WindowStyle.None;
             this.ResizeMode = ResizeMode.NoResize;
         }
@@ -73,16 +81,27 @@ namespace ComputerClub
             btnBack.Visibility = MainFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
             headerBorder.Visibility = Visibility.Visible;
             footerBorder.Visibility = Visibility.Visible;
-            this.WindowStyle = WindowStyle.SingleBorderWindow;
+            // В обычном режиме тоже без рамки, поэтому не возвращаем SingleBorderWindow
+            this.WindowStyle = WindowStyle.None;
             this.ResizeMode = ResizeMode.NoResize;
         }
+
+        // Блокировка Alt+F4
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.System && e.SystemKey == Key.F4)
             {
                 e.Handled = true;
+                return;
             }
             base.OnKeyDown(e);
+        }
+
+        // Опционально: блокировка закрытия окна через крестик (если вдруг появится)
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            // e.Cancel = true;   // раскомментируй, если хочешь полностью запретить закрытие
+            base.OnClosing(e);
         }
     }
 }
