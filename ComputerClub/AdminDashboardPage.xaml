@@ -36,8 +36,7 @@
                              Margin="0,0,0,40" Click="NavButton_Click" Tag="ReportsPage"/>
 
                 <!-- Выход внизу -->
-                <Button Content="Выйти" Style="{StaticResource YellowActionButton}"
-                        Background="#D32F2F" Foreground="White"
+                <Button Content="Выйти" Style="{StaticResource FinishSessionButton}"
                          Click="Logout_Click"/>
             </StackPanel>
         </Border>

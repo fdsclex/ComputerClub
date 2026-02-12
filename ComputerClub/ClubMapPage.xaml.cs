@@ -12,6 +12,7 @@ namespace ComputerClub
         {
             InitializeComponent();
             LoadDevices();
+            dgDevices.SelectionChanged += dgDevices_SelectionChanged;
         }
 
         private void LoadDevices()
@@ -20,7 +21,6 @@ namespace ComputerClub
             {
                 using (var ctx = new Entities())
                 {
-                    // Загружаем устройства + тарифы + активные сессии
                     var allDevices = ctx.Devices
                         .Include("Tariffs")
                         .ToList();
@@ -48,15 +48,15 @@ namespace ComputerClub
                         string duration = "—";
                         bool isInUse = activeSessions.TryGetValue(dev.DeviceID, out var session);
                         bool isReserved = reservedDeviceIds.Contains(dev.DeviceID);
-
                         string effectiveStatus = dev.Status;
+
                         if (isInUse) effectiveStatus = "InUse";
                         else if (isReserved && dev.Status == "Available") effectiveStatus = "Reserved";
 
                         if (isInUse)
                         {
                             var ts = DateTime.Now - session.StartTime;
-                            duration = $"{(int)ts.TotalHours:D2}:{ts.Minutes:D2}";
+                            duration = FormatDuration(ts);               // ← здесь используем красивый формат
                             currentClient = session.ClientFullName;
                         }
 
@@ -83,18 +83,29 @@ namespace ComputerClub
             }
         }
 
+        private string FormatDuration(TimeSpan ts)
+        {
+            if (ts.TotalMinutes < 1) return "<1 мин";
+            if (ts.TotalHours < 1) return $"{(int)ts.TotalMinutes} мин";
+            if (ts.TotalDays < 1) return $"{(int)ts.TotalHours} ч {ts.Minutes:D2} мин";
+            return $"{(int)ts.TotalDays} д {ts.Hours} ч {ts.Minutes:D2} мин";
+        }
+
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
             LoadDevices();
         }
 
-        private dynamic SelectedDevice => dgDevices.SelectedItem;
-
         private void dgDevices_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (SelectedDevice != null)
+            var item = dgDevices.SelectedItem;
+            if (item != null)
             {
-                tbSelectedInfo.Text = $"Выбрано устройство #{SelectedDevice.DeviceID} ({SelectedDevice.Name}) — {SelectedDevice.Status}";
+                var deviceId = (int)item.GetType().GetProperty("DeviceID").GetValue(item);
+                var name = (string)item.GetType().GetProperty("Name").GetValue(item);
+                var status = (string)item.GetType().GetProperty("Status").GetValue(item);
+
+                tbSelectedInfo.Text = $"Выбрано устройство #{deviceId} ({name}) — {status}";
             }
             else
             {
@@ -107,36 +118,39 @@ namespace ComputerClub
             var selected = dgDevices.SelectedItem;
             if (selected == null) return;
 
-            dynamic sel = selected;
+            var canFinishProp = selected.GetType().GetProperty("CanFinish");
+            var canFinish = (bool)canFinishProp.GetValue(selected);
+            if (!canFinish) return;
 
-            if (!sel.CanFinish) return;
+            var deviceIdProp = selected.GetType().GetProperty("DeviceID");
+            var deviceId = (int)deviceIdProp.GetValue(selected);
 
-            int deviceId = (int)sel.DeviceID;   // ← вытаскиваем значение заранее
+            var nameProp = selected.GetType().GetProperty("Name");
+            var name = (string)nameProp.GetValue(selected);
 
-            if (MessageBox.Show($"Завершить сессию на {sel.Name}?\nСредства будут списаны автоматически.",
-                                "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Завершить сессию на {name}?\nСредства будут списаны автоматически.",
+                                "Подтверждение", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
+            try
             {
-                try
+                using (var ctx = new Entities())
                 {
-                    using (var ctx = new Entities())
-                    {
-                        // Теперь в лямбде только статический int — EF нормально переведёт в SQL
-                        var session = ctx.Sessions
-                            .FirstOrDefault(s => s.DeviceID == deviceId && s.EndTime == null);
+                    var session = ctx.Sessions
+                        .FirstOrDefault(s => s.DeviceID == deviceId && s.EndTime == null);
 
-                        if (session != null)
-                        {
-                            session.EndTime = DateTime.Now;
-                            ctx.SaveChanges();
-                            MessageBox.Show("Сессия завершена. Деньги списаны.");
-                            LoadDevices();
-                        }
+                    if (session != null)
+                    {
+                        session.EndTime = DateTime.Now;
+                        ctx.SaveChanges();
+                        MessageBox.Show("Сессия завершена. Деньги списаны.");
+                        LoadDevices();
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка завершения сессии:\n{ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка завершения сессии:\n{ex.Message}");
             }
         }
 
@@ -147,30 +161,37 @@ namespace ComputerClub
 
         private void SetMaintenance_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedDevice == null) return;
+            var selected = dgDevices.SelectedItem;
+            if (selected == null) return;
 
-            string newStatus = SelectedDevice.Status == "Maintenance" ? "Available" : "Maintenance";
+            var statusProp = selected.GetType().GetProperty("Status");
+            var currentStatus = (string)statusProp.GetValue(selected);
+
+            string newStatus = currentStatus == "Maintenance" ? "Available" : "Maintenance";
 
             if (MessageBox.Show($"Перевести устройство в статус '{newStatus}'?", "Подтверждение",
-                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
+            var deviceIdProp = selected.GetType().GetProperty("DeviceID");
+            var deviceId = (int)deviceIdProp.GetValue(selected);
+
+            try
             {
-                try
+                using (var ctx = new Entities())
                 {
-                    using (var ctx = new Entities())
+                    var dev = ctx.Devices.Find(deviceId);
+                    if (dev != null)
                     {
-                        var dev = ctx.Devices.Find(SelectedDevice.DeviceID);
-                        if (dev != null)
-                        {
-                            dev.Status = newStatus;
-                            ctx.SaveChanges();
-                            LoadDevices();
-                        }
+                        dev.Status = newStatus;
+                        ctx.SaveChanges();
+                        LoadDevices();
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка изменения статуса:\n{ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка изменения статуса:\n{ex.Message}");
             }
         }
     }

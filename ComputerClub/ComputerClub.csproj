@@ -119,6 +119,9 @@
     <Compile Include="Games.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="InputBoxWindow.xaml.cs">
+      <DependentUpon>InputBoxWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MenuItems.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -206,6 +209,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DevicesManagementPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InputBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

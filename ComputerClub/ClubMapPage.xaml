@@ -2,7 +2,6 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Карта клуба">
-
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -10,14 +9,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
             <TextBlock Text="Карта клуба — состояние устройств"
                        FontSize="28" FontWeight="Bold"
                        Foreground="{StaticResource AccentYellow}"
                        VerticalAlignment="Center"/>
             <Button Content="Обновить"
                     Margin="30,0,0,0" Padding="16,8"
-                    Style="{StaticResource YellowActionButton}" Click="Refresh_Click"/>
+                    Style="{StaticResource YellowActionButton}"
+                    Click="Refresh_Click"/>
         </StackPanel>
 
         <DataGrid x:Name="dgDevices" Grid.Row="1"
@@ -34,17 +34,15 @@
                   AlternatingRowBackground="#161616"
                   BorderThickness="0"
                   RowHeaderWidth="0">
-
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Height" Value="Auto"/>
                     <Setter Property="MinHeight" Value="36"/>
                 </Style>
             </DataGrid.RowStyle>
-
             <DataGrid.Columns>
-                <DataGridTextColumn Header="№" Binding="{Binding DeviceID}" Width="60"/>
-                <DataGridTextColumn Header="Имя / №" Binding="{Binding Name}" Width="180">
+                <DataGridTextColumn Header="№" Binding="{Binding DeviceID}" Width="70"/>
+                <DataGridTextColumn Header="Имя / №" Binding="{Binding Name}" Width="220">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -53,24 +51,14 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="100"/>
+                <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="120"/>
                 <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource StatusTextBlock}">
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <!-- Все цвета и жирность уже в StatusTextBlock -->
-                        </Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource StatusTextBlock}"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Тариф" Binding="{Binding TariffName}" Width="160">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <Setter Property="ToolTip" Value="{Binding TariffName}"/>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Клиент" Binding="{Binding CurrentClientFullName}" Width="200">
+                <DataGridTextColumn Header="Тариф" Binding="{Binding TariffName}" Width="160"/>
+                <DataGridTextColumn Header="Клиент" Binding="{Binding CurrentClientFullName}" Width="240">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -83,15 +71,19 @@
                 <DataGridTemplateColumn Header="Действия" Width="400">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
                                 <Button Content="Завершить"
-                                        Style="{StaticResource SmallActionButton}"
-                                        Click="FinishSession_Click"/>
+                                        Style="{StaticResource FunButton}"
+                                        Margin="0,0,8,0"
+                                        Click="FinishSession_Click"
+                                        IsEnabled="{Binding CanFinish}"/>
                                 <Button Content="Заморозить"
-                                        Style="{StaticResource SmallActionButton}"
-                                        Click="FreezeSession_Click"/>
+                                        Style="{StaticResource FunButton}"
+                                        Margin="0,0,8,0"
+                                        Click="FreezeSession_Click"
+                                        IsEnabled="{Binding CanFreeze}"/>
                                 <Button Content="Тех.режим"
-                                        Style="{StaticResource SmallActionButton}"
+                                        Style="{StaticResource FunButton}"
                                         Click="SetMaintenance_Click"/>
                             </StackPanel>
                         </DataTemplate>
@@ -100,7 +92,8 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBlock x:Name="tbSelectedInfo" Grid.Row="2" Margin="0,16,0,0" FontSize="14"
+        <TextBlock x:Name="tbSelectedInfo" Grid.Row="2" Margin="0,16,0,0"
+                   FontSize="15" FontWeight="SemiBold"
                    Foreground="{StaticResource TextSecondary}"
                    Text="Выберите устройство..."/>
     </Grid>

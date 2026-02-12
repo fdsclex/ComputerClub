@@ -11,6 +11,7 @@ namespace ComputerClub
         {
             InitializeComponent();
             LoadDevices();
+            dgDevices.SelectionChanged += dgDevices_SelectionChanged;
         }
 
         private void LoadDevices()
@@ -48,13 +49,21 @@ namespace ComputerClub
             LoadDevices();
         }
 
-        private dynamic Selected => dgDevices.SelectedItem;
-
         private void dgDevices_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            tbSelectedInfo.Text = Selected != null
-                ? $"Выбрано устройство #{Selected.DeviceID} ({Selected.Name}) — {Selected.Status}"
-                : "Выберите устройство для редактирования или удаления...";
+            var item = dgDevices.SelectedItem;
+            if (item != null)
+            {
+                var deviceId = (int)item.GetType().GetProperty("DeviceID").GetValue(item);
+                var name = (string)item.GetType().GetProperty("Name").GetValue(item);
+                var status = (string)item.GetType().GetProperty("Status").GetValue(item);
+
+                tbSelectedInfo.Text = $"Выбрано устройство #{deviceId} ({name}) — {status}";
+            }
+            else
+            {
+                tbSelectedInfo.Text = "Выберите устройство для редактирования или удаления...";
+            }
         }
 
         private void AddDevice_Click(object sender, RoutedEventArgs e)
@@ -68,9 +77,12 @@ namespace ComputerClub
 
         private void EditDevice_Click(object sender, RoutedEventArgs e)
         {
-            if (Selected == null) return;
+            var selected = dgDevices.SelectedItem;
+            if (selected == null) return;
 
-            var window = new DeviceEditWindow(isNew: false, deviceId: Selected.DeviceID);
+            var deviceId = (int)selected.GetType().GetProperty("DeviceID").GetValue(selected);
+
+            var window = new DeviceEditWindow(isNew: false, deviceId: deviceId);
             if (window.ShowDialog() == true)
             {
                 LoadDevices();
@@ -79,29 +91,33 @@ namespace ComputerClub
 
         private void DeleteDevice_Click(object sender, RoutedEventArgs e)
         {
-            if (Selected == null) return;
+            var selected = dgDevices.SelectedItem;
+            if (selected == null) return;
 
-            if (MessageBox.Show($"Удалить устройство {Selected.Name} (ID {Selected.DeviceID})?\nЭто действие нельзя отменить.",
-                                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            var deviceId = (int)selected.GetType().GetProperty("DeviceID").GetValue(selected);
+            var name = (string)selected.GetType().GetProperty("Name").GetValue(selected);
+
+            if (MessageBox.Show($"Удалить устройство {name} (ID {deviceId})?\nЭто действие нельзя отменить.",
+                                "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
+
+            try
             {
-                try
+                using (var ctx = new Entities())
                 {
-                    using (var ctx = new Entities())
+                    var dev = ctx.Devices.Find(deviceId);
+                    if (dev != null)
                     {
-                        var dev = ctx.Devices.Find(Selected.DeviceID);
-                        if (dev != null)
-                        {
-                            ctx.Devices.Remove(dev);
-                            ctx.SaveChanges();
-                            MessageBox.Show("Устройство удалено.");
-                            LoadDevices();
-                        }
+                        ctx.Devices.Remove(dev);
+                        ctx.SaveChanges();
+                        MessageBox.Show("Устройство удалено.");
+                        LoadDevices();
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка удаления:\n{ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка удаления:\n{ex.Message}");
             }
         }
     }
