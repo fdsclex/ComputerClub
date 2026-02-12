@@ -586,4 +586,23 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!-- Цвета (добавь в ресурсы, если их ещё нет) -->
+    <SolidColorBrush x:Key="YesGreen" Color="#66BB6A"/>
+    <SolidColorBrush x:Key="NoRed"   Color="#EF5350"/>
+    <!-- Стиль для столбца "Да/Нет" (Доступно) -->
+    <Style x:Key="BooleanYesNoTextStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="Нет"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding}" Value="True">
+                <Setter Property="Text" Value="Да"/>
+                <Setter Property="Foreground" Value="{StaticResource YesGreen}"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding}" Value="False">
+                <Setter Property="Text" Value="Нет"/>
+                <Setter Property="Foreground" Value="{StaticResource NoRed}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

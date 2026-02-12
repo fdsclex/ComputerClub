@@ -122,6 +122,9 @@
     <Compile Include="InputBoxWindow.xaml.cs">
       <DependentUpon>InputBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MenuItemEditWindow.xaml.cs">
+      <DependentUpon>MenuItemEditWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MenuItems.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -228,6 +231,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MenuItemEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MenuManagementPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

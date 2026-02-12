@@ -31,6 +31,7 @@
                        Margin="0,0,12,0"/>
             <TextBox x:Name="tbSearchPhone" 
                      Width="200"
+                     Margin="0,0,12,0"
                      Style="{StaticResource DarkInput}"
                      TextChanged="tbSearchPhone_TextChanged"/>
         </StackPanel>
