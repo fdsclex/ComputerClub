@@ -1,0 +1,130 @@
+﻿<Page x:Class="ComputerClub.AdminPanel.ReportsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Отчёты и финансы">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок + кнопки -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+            <TextBlock Text="Отчёты и финансы"
+                       FontSize="28" FontWeight="Bold"
+                       Foreground="{StaticResource AccentYellow}"
+                       VerticalAlignment="Center"/>
+            <Button Content="Обновить"
+                    Margin="30,0,0,0" Padding="16,8"
+                    Style="{StaticResource YellowActionButton}"
+                    Click="Refresh_Click"/>
+            <Button Content="Экспорт в CSV"
+                    Margin="10,0,0,0" Padding="16,8"
+                    Style="{StaticResource FunButton}"
+                    Click="ExportCsv_Click"/>
+        </StackPanel>
+
+        <!-- Выбор периода -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" VerticalAlignment="Center">
+            <TextBlock Text="Период:"
+                       Style="{StaticResource FieldLabel}"
+                       VerticalAlignment="Center" Margin="0,0,12,0"/>
+            <ComboBox x:Name="cbPeriod"
+                      Width="220"
+                      Style="{StaticResource DarkComboBox}"
+                      SelectedIndex="0"
+                      SelectionChanged="cbPeriod_SelectionChanged">
+                <ComboBoxItem Content="Сегодня"/>
+                <ComboBoxItem Content="Вчера"/>
+                <ComboBoxItem Content="Текущий месяц"/>
+                <ComboBoxItem Content="Прошлый месяц"/>
+                <ComboBoxItem Content="Пользовательский период"/>
+                <ComboBoxItem Content="Всё время"/>
+            </ComboBox>
+
+            <TextBlock Text="с" Margin="24,0,8,0" VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
+            <DatePicker x:Name="dpFrom" Width="160" Style="{StaticResource DarkDatePicker}" IsEnabled="False"/>
+
+            <TextBlock Text="по" Margin="16,0,8,0" VerticalAlignment="Center" Style="{StaticResource FieldLabel}"/>
+            <DatePicker x:Name="dpTo"   Width="160" Style="{StaticResource DarkDatePicker}" IsEnabled="False"/>
+        </StackPanel>
+
+        <!-- Основной контент -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Выручка -->
+                <Border Background="#1E1E2E" CornerRadius="8" Padding="20" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Выручка за период"
+                                   FontSize="20" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"/>
+                        <TextBlock x:Name="tbRevenue"
+                                   Text="0 ₽"
+                                   FontSize="42" FontWeight="Bold"
+                                   Foreground="{StaticResource AccentYellow}"
+                                   Margin="0,12,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- График -->
+                <Border Background="#1E1E2E" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Выручка по дням"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,12"/>
+                        <Grid Height="340">
+                            <Canvas x:Name="canvasChart" Background="Transparent"/>
+                            <TextBlock x:Name="tbNoData"
+                                       Text="Нет данных за выбранный период"
+                                       Foreground="Gray" FontSize="18"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Visibility="Collapsed"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Топ-5 товаров -->
+                <Border Background="#1E1E2E" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Топ-5 товаров"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,8"/>
+                        <DataGrid x:Name="dgTopItems"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  Height="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Товар" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="100"/>
+                                <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat='{}{0:N0} ₽'}" Width="140"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Топ-5 клиентов -->
+                <Border Background="#1E1E2E" CornerRadius="8" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Топ-5 клиентов"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,0,8"/>
+                        <DataGrid x:Name="dgTopClients"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  Height="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Клиент" Binding="{Binding FullName}" Width="*"/>
+                                <DataGridTextColumn Header="Выручка" Binding="{Binding Total, StringFormat='{}{0:N0} ₽'}" Width="140"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

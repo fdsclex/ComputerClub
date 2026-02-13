@@ -28,6 +28,9 @@ namespace ComputerClub
         public System.DateTime StartTime { get; set; }
         public Nullable<System.DateTime> EndTime { get; set; }
         public string Status { get; set; }
+        public bool IsFrozen { get; set; }
+        public Nullable<System.DateTime> FreezeStartTime { get; set; }
+        public Nullable<int> MaxFreezeMinutes { get; set; }
     
         public virtual Clients Clients { get; set; }
         public virtual Devices Devices { get; set; }

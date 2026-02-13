@@ -4,20 +4,20 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="16727c26b46249e58518e03060547698" Name="Diagram1">
-        <EntityTypeShape EntityType="ComputerClubDBModel.Clients" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.DeviceGames" Width="1.5" PointX="6" PointY="9.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Devices" Width="1.5" PointX="3.75" PointY="9.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Employees" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Games" Width="1.5" PointX="3.75" PointY="13.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.MenuItems" Width="1.5" PointX="6" PointY="1.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.OrderItems" Width="1.5" PointX="8.25" PointY="5.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Orders" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Reservations" Width="1.5" PointX="6" PointY="5.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Sessions" Width="1.5" PointX="8.25" PointY="1.125" IsExpanded="true" />
+      <Diagram DiagramId="16c0c5657d234f139f44e2c2ee655a59" Name="Diagram1">
+        <EntityTypeShape EntityType="ComputerClubDBModel.Clients" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.DeviceGames" Width="1.5" PointX="6" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Devices" Width="1.5" PointX="3.75" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Employees" Width="1.5" PointX="0.75" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Games" Width="1.5" PointX="3.75" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.MenuItems" Width="1.5" PointX="6" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.OrderItems" Width="1.5" PointX="8.25" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Orders" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Reservations" Width="1.5" PointX="6" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Sessions" Width="1.5" PointX="8.25" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ComputerClubDBModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Tariffs" Width="1.5" PointX="1.5" PointY="9.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ComputerClubDBModel.Transactions" Width="1.5" PointX="11.25" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Tariffs" Width="1.5" PointX="1.5" PointY="10.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ComputerClubDBModel.Transactions" Width="1.5" PointX="11.25" PointY="5.375" IsExpanded="true" />
         <AssociationConnector Association="ComputerClubDBModel.FK__Orders__ClientID__619B8048" ManuallyRouted="false" />
         <AssociationConnector Association="ComputerClubDBModel.FK__Reservati__Clien__4F7CD00D" ManuallyRouted="false" />
         <AssociationConnector Association="ComputerClubDBModel.FK__Sessions__Client__5535A963" ManuallyRouted="false" />

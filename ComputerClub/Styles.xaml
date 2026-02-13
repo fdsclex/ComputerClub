@@ -351,6 +351,9 @@
                 <Setter Property="Foreground" Value="#EF5350"/>
                 <!-- красный -->
             </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Frozen">
+                <Setter Property="Foreground" Value="#8c92ac"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     
@@ -586,23 +589,198 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <!-- Цвета (добавь в ресурсы, если их ещё нет) -->
-    <SolidColorBrush x:Key="YesGreen" Color="#66BB6A"/>
-    <SolidColorBrush x:Key="NoRed"   Color="#EF5350"/>
-    <!-- Стиль для столбца "Да/Нет" (Доступно) -->
     <Style x:Key="BooleanYesNoTextStyle" TargetType="TextBlock">
-        <Setter Property="Text" Value="Нет"/>
-        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="Text"         Value="Нет"/>
+        <Setter Property="Foreground"   Value="{StaticResource TextSecondary}"/>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding}" Value="True">
-                <Setter Property="Text" Value="Да"/>
-                <Setter Property="Foreground" Value="{StaticResource YesGreen}"/>
+            <DataTrigger Binding="{Binding Available}" Value="True">
+                <Setter Property="Text"       Value="Да"/>
+                <Setter Property="Foreground" Value="#66BB6A"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding}" Value="False">
-                <Setter Property="Text" Value="Нет"/>
-                <Setter Property="Foreground" Value="{StaticResource NoRed}"/>
+            <DataTrigger Binding="{Binding Available}" Value="False">
+                <Setter Property="Text"       Value="Нет"/>
+                <Setter Property="Foreground" Value="#EF5350"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <!--                     Стиль календаря (всплывающего)                        -->
+    <Style x:Key="DarkCalendarStyle" TargetType="{x:Type Calendar}">
+        <Setter Property="Background" Value="{StaticResource BgInput}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderInput}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="CalendarButtonStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type CalendarButton}">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="Padding" Value="8"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type CalendarButton}">
+                                <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#1E1E1E"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Background" Value="#2A2A2A"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="CalendarDayButtonStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type CalendarDayButton}">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="Padding" Value="6"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type CalendarDayButton}">
+                                <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#222222"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#2A2A2A"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource AccentYellow}"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentYellow}"/>
+                                        <Setter Property="Foreground" Value="#000000"/>
+                                    </Trigger>
+                                    <Trigger Property="IsToday" Value="True">
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentYellow}"/>
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="2"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--                          DatePicker в твоей тёмной теме                   -->
+
+    <Style x:Key="DarkDatePicker" TargetType="{x:Type DatePicker}">
+    <Setter Property="Background" Value="{StaticResource BgInput}"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderInput}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Height" Value="44"/>
+    <Setter Property="FontSize" Value="15"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="CalendarStyle" Value="{StaticResource DarkCalendarStyle}"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="{x:Type DatePicker}">
+                <Grid>
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
+                            SnapsToDevicePixels="True">
+
+                        <Grid>
+                            <!-- Текстовое поле с отступом справа под кнопку -->
+                            <DatePickerTextBox x:Name="PART_TextBox"
+                                               Margin="4,0,36,0"
+                                               VerticalContentAlignment="Center"
+                                               Background="Transparent"
+                                               BorderThickness="0"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               Padding="2"
+                                               CaretBrush="{StaticResource AccentYellow}"/>
+
+                            <!-- ToggleButton — критично для открытия попапа -->
+                            <ToggleButton x:Name="PART_Button"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,8,0"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <Path Data="M0,0 L5,5 L10,0 Z"
+                                      Fill="{StaticResource TextPrimary}"
+                                      Width="10" Height="6"/>
+                            </ToggleButton>
+                        </Grid>
+                    </Border>
+
+                    <!-- Popup с обязательным именем PART_Popup -->
+                    <Popup x:Name="PART_Popup"
+                           Placement="Bottom"
+                           PlacementTarget="{Binding ElementName=Border}"
+                           AllowsTransparency="True"
+                           StaysOpen="False"
+                           IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+
+                        <Border Background="{StaticResource BgInput}"
+                                BorderBrush="{StaticResource BorderInput}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="4,2,4,8"
+                                MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+
+                            <Calendar x:Name="PART_Calendar"
+                                      Style="{TemplateBinding CalendarStyle}"
+                                      SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      DisplayDate="{Binding DisplayDate, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      FirstDayOfWeek="{Binding FirstDayOfWeek, RelativeSource={RelativeSource TemplatedParent}}"
+                                      IsTodayHighlighted="True"/>
+                        </Border>
+                    </Popup>
+                </Grid>
+
+                <!-- Триггеры для hover/focus/disabled -->
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentYellow}"/>
+                    </Trigger>
+                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentYellow}"/>
+                        <Setter TargetName="Border" Property="BorderThickness" Value="2"/>
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.45"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+
 </ResourceDictionary>

@@ -67,51 +67,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdminDashboardPage.xaml.cs">
+    <Compile Include="AdminPanel\AdminDashboardPage.xaml.cs">
       <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AdminLoginPage.xaml.cs">
-      <DependentUpon>AdminLoginPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AppConfig.cs" />
-    <Compile Include="CaptchaWindow.xaml.cs">
-      <DependentUpon>CaptchaWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientDashboardPage.xaml.cs">
-      <DependentUpon>ClientDashboardPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientLoginPage.xaml.cs">
-      <DependentUpon>ClientLoginPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientModeSelectionPage.xaml.cs">
-      <DependentUpon>ClientModeSelectionPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientRegistrationPage.xaml.cs">
-      <DependentUpon>ClientRegistrationPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Clients.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="ClientsPage.xaml.cs">
-      <DependentUpon>ClientsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClubMapPage.xaml.cs">
-      <DependentUpon>ClubMapPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DeviceEditWindow.xaml.cs">
-      <DependentUpon>DeviceEditWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DeviceGames.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="DeviceInputPage.xaml.cs">
-      <DependentUpon>DeviceInputPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Devices.cs">
       <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DevicesManagementPage.xaml.cs">
-      <DependentUpon>DevicesManagementPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Employees.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -119,22 +85,66 @@
     <Compile Include="Games.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="InputBoxWindow.xaml.cs">
-      <DependentUpon>InputBoxWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MenuItemEditWindow.xaml.cs">
-      <DependentUpon>MenuItemEditWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MenuItems.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="MenuManagementPage.xaml.cs">
-      <DependentUpon>MenuManagementPage.xaml</DependentUpon>
+    <Compile Include="Model.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model.Context.tt</DependentUpon>
     </Compile>
     <Compile Include="Model.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\AdminLoginPage.xaml.cs">
+      <DependentUpon>AdminLoginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AppConfig.cs" />
+    <Compile Include="Navigation\CaptchaWindow.xaml.cs">
+      <DependentUpon>CaptchaWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\ClientDashboardPage.xaml.cs">
+      <DependentUpon>ClientDashboardPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\ClientLoginPage.xaml.cs">
+      <DependentUpon>ClientLoginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\ClientModeSelectionPage.xaml.cs">
+      <DependentUpon>ClientModeSelectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\ClientRegistrationPage.xaml.cs">
+      <DependentUpon>ClientRegistrationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\ClientsPage.xaml.cs">
+      <DependentUpon>ClientsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\ClubMapPage.xaml.cs">
+      <DependentUpon>ClubMapPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\DeviceEditWindow.xaml.cs">
+      <DependentUpon>DeviceEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\DeviceInputPage.xaml.cs">
+      <DependentUpon>DeviceInputPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\DevicesManagementPage.xaml.cs">
+      <DependentUpon>DevicesManagementPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\InputBoxWindow.xaml.cs">
+      <DependentUpon>InputBoxWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\MenuItemEditWindow.xaml.cs">
+      <DependentUpon>MenuItemEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\MenuManagementPage.xaml.cs">
+      <DependentUpon>MenuManagementPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="OrderItems.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -143,20 +153,20 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="PasswordHelper.cs" />
-    <Compile Include="ReportsPage.xaml.cs">
+    <Compile Include="AdminPanel\ReportsPage.xaml.cs">
       <DependentUpon>ReportsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\RoleSelectionPage.xaml.cs">
+      <DependentUpon>RoleSelectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminPanel\SessionsPage.xaml.cs">
+      <DependentUpon>SessionsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Reservations.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="RoleSelectionPage.xaml.cs">
-      <DependentUpon>RoleSelectionPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Sessions.cs">
       <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="SessionsPage.xaml.cs">
-      <DependentUpon>SessionsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="sysdiagrams.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -167,55 +177,55 @@
     <Compile Include="Transactions.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Page Include="AdminDashboardPage.xaml">
+    <Page Include="AdminPanel\AdminDashboardPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AdminLoginPage.xaml">
+    <Page Include="Navigation\AdminLoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CaptchaWindow.xaml">
+    <Page Include="Navigation\CaptchaWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientDashboardPage.xaml">
+    <Page Include="ClientPanel\ClientDashboardPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientLoginPage.xaml">
+    <Page Include="Navigation\ClientLoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientModeSelectionPage.xaml">
+    <Page Include="Navigation\ClientModeSelectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientRegistrationPage.xaml">
+    <Page Include="Navigation\ClientRegistrationPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClientsPage.xaml">
+    <Page Include="AdminPanel\ClientsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ClubMapPage.xaml">
+    <Page Include="AdminPanel\ClubMapPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceEditWindow.xaml">
+    <Page Include="AdminPanel\DeviceEditWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceInputPage.xaml">
+    <Page Include="Navigation\DeviceInputPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DevicesManagementPage.xaml">
+    <Page Include="AdminPanel\DevicesManagementPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InputBoxWindow.xaml">
+    <Page Include="AdminPanel\InputBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -231,23 +241,23 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MenuItemEditWindow.xaml">
+    <Page Include="AdminPanel\MenuItemEditWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MenuManagementPage.xaml">
+    <Page Include="AdminPanel\MenuManagementPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ReportsPage.xaml">
+    <Page Include="AdminPanel\ReportsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RoleSelectionPage.xaml">
+    <Page Include="Navigation\RoleSelectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SessionsPage.xaml">
+    <Page Include="AdminPanel\SessionsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -257,16 +267,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Model.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -301,19 +301,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Model.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Model.Context.cs</LastGenOutput>
       <DependentUpon>Model.edmx</DependentUpon>
+      <LastGenOutput>Model.Context.cs</LastGenOutput>
     </Content>
     <Content Include="Model.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Model.edmx</DependentUpon>
       <LastGenOutput>Model.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

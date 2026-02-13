@@ -114,6 +114,9 @@
           <Property Name="StartTime" Type="datetime" Nullable="false" />
           <Property Name="EndTime" Type="datetime" />
           <Property Name="Status" Type="nvarchar" MaxLength="20" />
+          <Property Name="IsFrozen" Type="bit" Nullable="false" />
+          <Property Name="FreezeStartTime" Type="datetime" />
+          <Property Name="MaxFreezeMinutes" Type="int" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -596,6 +599,9 @@
           <Property Name="StartTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="EndTime" Type="DateTime" Precision="3" />
           <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="IsFrozen" Type="Boolean" Nullable="false" />
+          <Property Name="FreezeStartTime" Type="DateTime" Precision="3" />
+          <Property Name="MaxFreezeMinutes" Type="Int32" />
           <NavigationProperty Name="Clients" Relationship="Self.FK__Sessions__Client__5535A963" FromRole="Sessions" ToRole="Clients" />
           <NavigationProperty Name="Devices" Relationship="Self.FK__Sessions__Device__5629CD9C" FromRole="Sessions" ToRole="Devices" />
           <NavigationProperty Name="Employees" Relationship="Self.FK__Sessions__Employ__571DF1D5" FromRole="Sessions" ToRole="Employees" />
@@ -1073,6 +1079,9 @@
                 <ScalarProperty Name="StartTime" ColumnName="StartTime" />
                 <ScalarProperty Name="EndTime" ColumnName="EndTime" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
+                <ScalarProperty Name="FreezeStartTime" ColumnName="FreezeStartTime" />
+                <ScalarProperty Name="MaxFreezeMinutes" ColumnName="MaxFreezeMinutes" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

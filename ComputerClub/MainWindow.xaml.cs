@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ComputerClub.AdminPanel;
+using ComputerClub.ClientPanel;
+using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
@@ -25,7 +27,7 @@ namespace ComputerClub
             timer.Start();
 
             MainFrame.Navigated += MainFrame_Navigated;
-            MainFrame.Navigate(new RoleSelectionPage());
+            MainFrame.Navigate(new ComputerClub.Navigation.RoleSelectionPage());
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -37,6 +39,21 @@ namespace ComputerClub
         {
             btnBack.Visibility = MainFrame.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
             UpdatePcNumberVisibility();
+            if (e.Content is AdminDashboardPage ||
+            e.Content is ClientsPage ||
+            e.Content is DevicesManagementPage ||
+            e.Content is MenuManagementPage ||
+            e.Content is ReportsPage ||
+            e.Content is SessionsPage ||
+            e.Content is ClubMapPage ||
+            e.Content is ClientDashboardPage)
+            {
+                btnBack.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                btnBack.Visibility = Visibility.Visible;
+            }
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
@@ -53,9 +70,9 @@ namespace ComputerClub
         private void UpdatePcNumberVisibility()
         {
             bool showPc = AppConfig.IsOnSite && AppConfig.DeviceNumber.HasValue &&
-                          (MainFrame.Content is ClientLoginPage ||
-                           MainFrame.Content is ClientRegistrationPage ||
-                           MainFrame.Content is ClientDashboardPage);
+                          (MainFrame.Content is ComputerClub.Navigation.ClientLoginPage ||
+                           MainFrame.Content is ComputerClub.Navigation.ClientRegistrationPage ||
+                           MainFrame.Content is ComputerClub.ClientPanel.ClientDashboardPage);
 
             tbPcNumber.Visibility = showPc ? Visibility.Visible : Visibility.Collapsed;
 
