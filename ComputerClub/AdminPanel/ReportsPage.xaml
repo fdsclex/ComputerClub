@@ -96,7 +96,8 @@
                         <DataGrid x:Name="dgTopItems"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
-                                  Height="220">
+                                  Height="220" HeadersVisibility="Column"
+          RowHeaderWidth="0">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Товар" Binding="{Binding Name}" Width="*"/>
                                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="100"/>
@@ -116,7 +117,8 @@
                         <DataGrid x:Name="dgTopClients"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
-                                  Height="220">
+                                  Height="220" HeadersVisibility="Column"
+          RowHeaderWidth="0">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Клиент" Binding="{Binding FullName}" Width="*"/>
                                 <DataGridTextColumn Header="Выручка" Binding="{Binding Total, StringFormat='{}{0:N0} ₽'}" Width="140"/>

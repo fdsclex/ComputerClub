@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -114,12 +116,9 @@ namespace ComputerClub.AdminPanel
 
         private void RefreshReports()
         {
-            if (!IsLoaded) return;                    // ещё не загружено → выходим
-
-            // Проверяем ключевые элементы
+            if (!IsLoaded) return;
             if (tbRevenue == null || canvasChart == null || tbNoData == null)
             {
-                // Можно даже логировать или показать сообщение разработчику
                 System.Diagnostics.Debug.WriteLine("UI элементы ещё не инициализированы!");
                 return;
             }
@@ -130,73 +129,105 @@ namespace ComputerClub.AdminPanel
                     var range = GetDateRange();
                     DateTime start = range.Item1;
                     DateTime end = range.Item2;
-
                     if (start == DateTime.MinValue) return;
 
-                    // Общая выручка
-                    decimal revenue = ctx.Orders
-                        .Where(o => o.OrderDate >= start && o.OrderDate < end && o.Status == "Completed")
-                        .Sum(o => (decimal?)o.TotalAmount) ?? 0m;
+                    // ─────────────────────────────────────────────────────────────
+                    // Общая выручка за период
+                    // ─────────────────────────────────────────────────────────────
+                    decimal totalRevenue = ctx.Transactions
+                        .Where(t => t.TransactionDate >= start
+                                 && t.TransactionDate < end
+                                 && t.Amount < 0
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                        .Sum(t => (decimal?)-t.Amount) ?? 0m;
 
-                    tbRevenue.Text = revenue.ToString("N0") + " ₽";
+                    tbRevenue.Text = totalRevenue.ToString("N0") + " ₽";
 
-                    // Данные по дням
-                    var dailyDataTemp = ctx.Orders
-    .Where(o => o.OrderDate >= start && o.OrderDate < end && o.Status == "Completed")
-    .AsEnumerable()                             // ← !!! переносим обработку в память
-    .GroupBy(o => o.OrderDate.Value.Date)       // теперь .Date работает в LINQ to Objects
-    .Select(g => new
-    {
-        Date = g.Key,
-        Sum = g.Sum(o => (decimal?)o.TotalAmount) ?? 0m
-    })
-    .OrderBy(x => x.Date)
-    .ToList();
+                    // ─────────────────────────────────────────────────────────────
+                    // Данные по дням для графика
+                    // ─────────────────────────────────────────────────────────────
+                    var dailyDataTemp = ctx.Transactions
+                        .Where(t => t.TransactionDate >= start
+                                 && t.TransactionDate < end
+                                 && t.Amount < 0
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                        .GroupBy(t => DbFunctions.TruncateTime(t.TransactionDate))
+                        .Select(g => new
+                        {
+                            Date = g.Key ?? DateTime.MinValue,
+                            Sum = g.Sum(t => (decimal?)-t.Amount) ?? 0m
+                        })
+                        .Where(x => x.Date != DateTime.MinValue)
+                        .OrderBy(x => x.Date)
+                        .ToList();
 
                     dailyDataCache = dailyDataTemp
-                        .Select(d => new DailyRevenue { Date = d.Date, Sum = d.Sum })
+                        .Select(d => new DailyRevenue
+                        {
+                            Date = d.Date,
+                            Sum = d.Sum
+                        })
                         .ToList();
 
                     DrawChart(dailyDataCache);
 
-                    // Топ-5 товаров
-                    var topItems = (from oi in ctx.OrderItems
-                                    join o in ctx.Orders on oi.OrderID equals o.OrderID
-                                    where o.OrderDate >= start && o.OrderDate < end && o.Status == "Completed"
-                                    group oi by oi.MenuItemID into g
-                                    join m in ctx.MenuItems on g.Key equals m.MenuItemID
-                                    orderby g.Sum(oi => (decimal?)oi.Subtotal) descending
-                                    select new
-                                    {
-                                        Name = m.Name,
-                                        Quantity = g.Sum(oi => (int?)oi.Quantity) ?? 0,     // если Quantity тоже может быть null
-                                        Total = g.Sum(oi => (decimal?)oi.Subtotal) ?? 0m
-                                    })
-                                    .Take(5)
-                                    .ToList();
+                    // ─────────────────────────────────────────────────────────────
+                    // Топ-5 товаров — без .First() внутри Select
+                    // ─────────────────────────────────────────────────────────────
+                    var topItems = ctx.OrderItems
+                        .Join(ctx.Orders, oi => oi.OrderID, o => o.OrderID, (oi, o) => new { oi, o })
+                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && x.o.Status == "Completed")
+                        .GroupBy(x => x.oi.MenuItemID)
+                        .Select(g => new
+                        {
+                            MenuItemID = g.Key,
+                            Quantity = g.Sum(x => x.oi.Quantity),
+                            Total = g.Sum(x => (decimal?)x.oi.Subtotal) ?? 0m
+                        })
+                        .Join(ctx.MenuItems, g => g.MenuItemID, m => m.MenuItemID, (g, m) => new
+                        {
+                            Name = m.Name,
+                            Quantity = g.Quantity,
+                            Total = g.Total
+                        })
+                        .OrderByDescending(x => x.Total)
+                        .Take(5)
+                        .ToList();
 
                     dgTopItems.ItemsSource = topItems;
 
-                    // Топ-5 клиентов — аналогично
-                    var topClients = (from o in ctx.Orders
-                                      where o.OrderDate >= start && o.OrderDate < end && o.Status == "Completed"
-                                      group o by o.ClientID into g
-                                      join c in ctx.Clients on g.Key equals c.ClientID
-                                      orderby g.Sum(o => (decimal?)o.TotalAmount) descending
-                                      select new
-                                      {
-                                          FullName = c.FullName,
-                                          Total = g.Sum(o => (decimal?)o.TotalAmount) ?? 0m
-                                      })
-                                      .Take(5)
-                                      .ToList();
+                    // ─────────────────────────────────────────────────────────────
+                    // Топ-5 клиентов — тоже без .First()
+                    // ─────────────────────────────────────────────────────────────
+                    var topClients = ctx.Transactions
+                        .Where(t => t.TransactionDate >= start
+                                 && t.TransactionDate < end
+                                 && t.Amount < 0
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                        .GroupBy(t => t.ClientID)
+                        .Select(g => new
+                        {
+                            ClientID = g.Key,
+                            TotalSpent = g.Sum(t => -t.Amount)
+                        })
+                        .Join(ctx.Clients, g => g.ClientID, c => c.ClientID, (g, c) => new
+                        {
+                            FullName = c.FullName ?? "Гость",
+                            Total = g.TotalSpent
+                        })
+                        .OrderByDescending(x => x.Total)
+                        .Take(5)
+                        .ToList();
 
                     dgTopClients.ItemsSource = topClients;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка обновления отчётов:\n" + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка обновления отчётов:\n" + ex.Message,
+                                "Ошибка",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
             }
         }
 
@@ -369,55 +400,113 @@ namespace ComputerClub.AdminPanel
                 DateTime start = range.Item1;
                 DateTime end = range.Item2;
 
-                if (start == DateTime.MinValue) return;
+                string periodName;
+                switch (cbPeriod.SelectedIndex)
+                {
+                    case 0: periodName = "Сегодня"; break;
+                    case 1: periodName = "Вчера"; break;
+                    case 2: periodName = $"Текущий месяц ({start:MMMM yyyy})"; break;
+                    case 3: periodName = $"Прошлый месяц ({start:MMMM yyyy})"; break;
+                    case 4: periodName = $"Пользовательский ({start:dd.MM.yyyy} – {end.AddDays(-1):dd.MM.yyyy})"; break;
+                    default: periodName = "Всё время"; break;
+                }
 
                 using (var ctx = new Entities())
                 {
-                    var ordersQuery = from o in ctx.Orders
-                                      where o.OrderDate >= start && o.OrderDate < end && o.Status == "Completed"
-                                      select new
-                                      {
-                                          o.OrderID,
-                                          OrderDate = o.OrderDate.Value,
-                                          ClientName = o.Clients != null ? o.Clients.FullName : "Гость",
-                                          Amount = o.TotalAmount
-                                      };
+                    // Общая выручка
+                    decimal totalRevenue = ctx.Transactions
+                        .Where(t => t.TransactionDate >= start && t.TransactionDate < end
+                                 && t.Amount < 0
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                        .Sum(t => (decimal?)-t.Amount) ?? 0m;
 
-                    var orders = ordersQuery.OrderBy(o => o.OrderDate).ToList();
+                    // Топ-5 товаров
+                    var topItems = ctx.OrderItems
+                        .Join(ctx.Orders, oi => oi.OrderID, o => o.OrderID, (oi, o) => new { oi, o })
+                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && x.o.Status == "Completed")
+                        .GroupBy(x => x.oi.MenuItemID)
+                        .Select(g => new
+                        {
+                            MenuItemID = g.Key,
+                            Quantity = g.Sum(x => x.oi.Quantity),
+                            Total = g.Sum(x => (decimal?)x.oi.Subtotal) ?? 0m
+                        })
+                        .Join(ctx.MenuItems, g => g.MenuItemID, m => m.MenuItemID, (g, m) => new
+                        {
+                            Name = m.Name ?? "Неизвестно",
+                            Quantity = g.Quantity,
+                            Total = g.Total
+                        })
+                        .OrderByDescending(x => x.Total)
+                        .Take(5)
+                        .ToList();
 
-                    decimal total = 0m;
-                    foreach (var ord in orders)
+                    // Топ-5 клиентов
+                    var topClients = ctx.Transactions
+                        .Where(t => t.TransactionDate >= start && t.TransactionDate < end
+                                 && t.Amount < 0
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                        .GroupBy(t => t.ClientID)
+                        .Select(g => new
+                        {
+                            ClientID = g.Key,
+                            TotalSpent = g.Sum(t => -t.Amount)
+                        })
+                        .Join(ctx.Clients, g => g.ClientID, c => c.ClientID, (g, c) => new
+                        {
+                            FullName = c.FullName ?? "Гость",
+                            Total = g.TotalSpent
+                        })
+                        .OrderByDescending(x => x.Total)
+                        .Take(5)
+                        .ToList();
+
+                    // Формируем CSV — аккуратный и читаемый в Excel
+                    var sb = new StringBuilder();
+
+                    // Заголовок отчёта
+                    sb.AppendLine($"Отчёт: {periodName}");
+                    sb.AppendLine($"Период: {start:dd.MM.yyyy} – {end.AddDays(-1):dd.MM.yyyy}");
+                    sb.AppendLine($"Общая выручка: {totalRevenue:N0} ₽");
+                    sb.AppendLine("");
+
+                    // Топ-5 товаров
+                    sb.AppendLine("Топ-5 товаров");
+                    sb.AppendLine("Название;Количество;Сумма (₽)");
+                    foreach (var item in topItems)
                     {
-                        total += ord.Amount;
+                        sb.AppendLine($"\"{item.Name.Replace("\"", "\"\"")}\";{item.Quantity};{item.Total:N0}");
+                    }
+                    sb.AppendLine("");
+
+                    // Топ-5 клиентов
+                    sb.AppendLine("Топ-5 клиентов");
+                    sb.AppendLine("Клиент;Потрачено (₽)");
+                    foreach (var client in topClients)
+                    {
+                        sb.AppendLine($"\"{client.FullName.Replace("\"", "\"\"")}\";{client.Total:N0}");
                     }
 
-                    List<string> lines = new List<string>();
-                    lines.Add("Отчёт по заказам за период");
-                    lines.Add("Период: " + start.ToString("dd.MM.yyyy") + " – " + end.AddDays(-1).ToString("dd.MM.yyyy"));
-                    lines.Add("Общая выручка: " + total.ToString("N0") + " ₽");
-                    lines.Add("");
-                    lines.Add("ID;Дата;Клиент;Сумма");
-
-                    foreach (var o in orders)
+                    // Диалог сохранения
+                    var dialog = new Microsoft.Win32.SaveFileDialog
                     {
-                        lines.Add(o.OrderID.ToString() + ";" +
-                                  o.OrderDate.ToString("dd.MM.yyyy HH:mm") + ";" +
-                                  o.ClientName + ";" +
-                                  o.Amount.ToString("N0"));
+                        FileName = $"Отчёт_{DateTime.Now:yyyy-MM-dd_HH-mm}.csv",
+                        DefaultExt = ".csv",
+                        Filter = "CSV файлы (*.csv)|*.csv|Все файлы (*.*)|*.*"
+                    };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        // UTF-8 + BOM — Excel откроет русские символы без кракозябр
+                        File.WriteAllText(dialog.FileName, "\uFEFF" + sb.ToString(), Encoding.UTF8);
+                        MessageBox.Show("Отчёт успешно сохранён!\n\nФайл готов к открытию в Excel.",
+                                        "Экспорт завершён", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-
-                    string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                    string fileName = "Отчет_КомпьютерныйКлуб_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + ".csv";
-                    string fullPath = System.IO.Path.Combine(desktopPath, fileName);
-
-                    File.WriteAllLines(fullPath, lines, System.Text.Encoding.UTF8);
-
-                    MessageBox.Show("Отчёт сохранён на рабочий стол:\n" + fullPath, "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка экспорта:\n" + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка экспорта:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
