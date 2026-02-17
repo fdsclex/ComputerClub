@@ -103,7 +103,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount, StringFormat='{}{0:N0} ₽'}" Width="110"/>
-                        <DataGridTemplateColumn Header="Действия" Width="140">
+                        <DataGridTemplateColumn Header="Действия" Width="200">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="Удалить"
@@ -167,7 +167,7 @@
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource BooleanYesNoTextStyle}"/>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTemplateColumn Header="Действия" Width="250">
+                        <DataGridTemplateColumn Header="Действия" Width="300">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

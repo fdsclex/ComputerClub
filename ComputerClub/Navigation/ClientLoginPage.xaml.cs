@@ -49,7 +49,7 @@ namespace ComputerClub.Navigation
                     captchaPanel.Visibility = Visibility.Collapsed;
                     loginPanel.Visibility = Visibility.Visible;
                     ((MainWindow)Application.Current.MainWindow).ExitCaptchaMode();
-                    NavigationService.Navigate(new ComputerClub.ClientPanel.ClientDashboardPage());
+                    NavigationService.Navigate(new ComputerClub.ClientPanel.ClientShellPage());
                 }
                 else
                 {

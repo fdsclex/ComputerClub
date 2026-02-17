@@ -1,0 +1,139 @@
+﻿<Page x:Class="ComputerClub.ClientPanel.ClientShellPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Colizeum Client">
+
+    <Grid Background="#0F0F1A">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="120"/>
+        </Grid.RowDefinitions>
+
+        <!-- Основной контент -->
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- баннер + игры -->
+                <RowDefinition Height="*"/>
+                <!-- программы + другое -->
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <!-- левый блок стал шире -->
+                <ColumnDefinition Width="*"/>
+                <!-- правый блок стал уже -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Баннер справа сверху – чуть уже -->
+            <Border Grid.Column="1" Grid.Row="0" Background="#1A1A2E" CornerRadius="12" Height="380" Margin="16,0,0,16">
+                <TextBlock Text="Реклама"
+                           FontSize="38" FontWeight="Bold"
+                           Foreground="{StaticResource AccentYellow}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           TextWrapping="Wrap" TextAlignment="Center"/>
+            </Border>
+
+            <!-- Игры слева сверху – иконки 120×120 -->
+            <Border Grid.Column="0" Grid.Row="0" Background="#1A1A2E" CornerRadius="12" Margin="0,0,16,8">
+                <StackPanel Margin="16">
+                    <TextBlock Text="ИГРЫ" FontSize="22" FontWeight="Bold" Foreground="#AAAAAA" Margin="0,0,0,16"/>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <UniformGrid Columns="2">
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Steam">
+                                <Image Source="pack://application:,,,/Resources/steam.png" Width="80" Height="80"/>
+                            </Button>
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Epic Games">
+                                <Image Source="pack://application:,,,/Resources/epic.png" Width="80" Height="80"/>
+                            </Button>
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Battle.net">
+                                <Image Source="pack://application:,,,/Resources/battlenet.png" Width="80" Height="80"/>
+                            </Button>
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="EA App">
+                                <Image Source="pack://application:,,,/Resources/ea.png" Width="80" Height="80"/>
+                            </Button>
+                            <!-- Добавляй новые иконки – всё влезет благодаря ScrollViewer -->
+                        </UniformGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
+            <!-- Программы ниже игр слева – иконки 120×120 -->
+            <Border Grid.Column="0" Grid.Row="1" Background="#1A1A2E" CornerRadius="12" Margin="0,8,16,0">
+                <StackPanel Margin="16">
+                    <TextBlock Text="ПРОГРАММЫ" FontSize="22" FontWeight="Bold" Foreground="#AAAAAA" Margin="0,0,0,16"/>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <UniformGrid Columns="2">
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Discord">
+                                <Image Source="pack://application:,,,/Resources/discord.png" Width="80" Height="80"/>
+                            </Button>
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="OBS Studio">
+                                <Image Source="pack://application:,,,/Resources/obs.png" Width="80" Height="80"/>
+                            </Button>
+                            <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Logitech G">
+                                <Image Source="pack://application:,,,/Resources/logitech.png" Width="80" Height="80"/>
+                            </Button>
+                            <!-- Добавляй новые -->
+                        </UniformGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+
+            <!-- Другое – справа от программ, ниже баннера – иконки 120×120 -->
+            <Border Grid.Column="1" Grid.Row="1" Background="#1A1A2E" CornerRadius="12" Margin="16,8,0,0">
+                <StackPanel Margin="16">
+                    <TextBlock Text="ДРУГОЕ" FontSize="22" FontWeight="Bold" Foreground="#AAAAAA" Margin="0,0,0,16"/>
+
+                    <UniformGrid Columns="2">
+                        <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Браузер">
+                            <Image Source="pack://application:,,,/Resources/browser.png" Width="80" Height="80"/>
+                        </Button>
+                        <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="YouTube">
+                            <Image Source="pack://application:,,,/Resources/youtube.png" Width="80" Height="80"/>
+                        </Button>
+                        <Button Width="120" Height="120" Margin="8" Style="{StaticResource FunButton}" ToolTip="Chrome">
+                            <Image Source="pack://application:,,,/Resources/chrome.png" Width="80" Height="80"/>
+                        </Button>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Нижняя панель -->
+        <Border Background="#1A1A2E" Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,40,0">
+                    <!-- QR закомментирован -->
+                    <!-- <Image Source="..." Width="80" Height="80" Margin="0,0,16,0"/> -->
+                    <Button Content="ПРОВЕРИТЬ БАЛАНС"
+        Width="280" Height="80"
+        Style="{StaticResource YellowActionButton}"
+        Click="CheckBalance_Click">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.Click">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.7" Duration="0:0:0.1" AutoReverse="True"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+
+                <Button Grid.Column="2" Content="Личный кабинет"
+                        Style="{StaticResource YellowActionButton}"
+                        VerticalAlignment="Center" Margin="0,0,20,0"
+                        Click="OpenCabinet_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

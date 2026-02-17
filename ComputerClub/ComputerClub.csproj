@@ -70,6 +70,24 @@
     <Compile Include="AdminPanel\AdminDashboardPage.xaml.cs">
       <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ClientPanel\CabinetLoyaltyPage.xaml.cs">
+      <DependentUpon>CabinetLoyaltyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetNotificationsPage.xaml.cs">
+      <DependentUpon>CabinetNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetProfilePage.xaml.cs">
+      <DependentUpon>CabinetProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetShopPage.xaml.cs">
+      <DependentUpon>CabinetShopPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\ClientCabinetPage.xaml.cs">
+      <DependentUpon>ClientCabinetPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\ClientShellPage.xaml.cs">
+      <DependentUpon>ClientShellPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Clients.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -109,9 +127,6 @@
     <Compile Include="AppConfig.cs" />
     <Compile Include="Navigation\CaptchaWindow.xaml.cs">
       <DependentUpon>CaptchaWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\ClientDashboardPage.xaml.cs">
-      <DependentUpon>ClientDashboardPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Navigation\ClientLoginPage.xaml.cs">
       <DependentUpon>ClientLoginPage.xaml</DependentUpon>
@@ -181,15 +196,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ClientPanel\CabinetLoyaltyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientPanel\CabinetNotificationsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientPanel\CabinetProfilePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientPanel\CabinetShopPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientPanel\ClientCabinetPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientPanel\ClientShellPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Navigation\AdminLoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Navigation\CaptchaWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ClientPanel\ClientDashboardPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -314,6 +349,17 @@
       <DependentUpon>Model.edmx</DependentUpon>
       <LastGenOutput>Model.cs</LastGenOutput>
     </Content>
+    <Resource Include="Resources\food_placeholder.png" />
+    <Resource Include="Resources\logitech.png" />
+    <Resource Include="Resources\chrome.png" />
+    <Resource Include="Resources\ea.png" />
+    <Resource Include="Resources\battlenet.png" />
+    <Resource Include="Resources\youtube.png" />
+    <Resource Include="Resources\browser.png" />
+    <Resource Include="Resources\obs.png" />
+    <Resource Include="Resources\discord.png" />
+    <Resource Include="Resources\steam.png" />
+    <Resource Include="Resources\epic.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -42,7 +42,7 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding DeviceID}" Width="70"/>
-                <DataGridTextColumn Header="Имя / №" Binding="{Binding Name}" Width="220">
+                <DataGridTextColumn Header="Имя / №" Binding="{Binding Name}" Width="150">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -57,8 +57,8 @@
                         <Style TargetType="TextBlock" BasedOn="{StaticResource StatusTextBlock}"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Тариф" Binding="{Binding TariffName}" Width="160"/>
-                <DataGridTextColumn Header="Клиент" Binding="{Binding CurrentClientFullName}" Width="240">
+                <DataGridTextColumn Header="Тариф" Binding="{Binding TariffName}" Width="150"/>
+                <DataGridTextColumn Header="Клиент" Binding="{Binding CurrentClientFullName}" Width="200">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -67,8 +67,8 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Время сессии" Binding="{Binding SessionDuration}" Width="180"/>
-                <DataGridTemplateColumn Header="Действия" Width="480">
+                <DataGridTextColumn Header="Время сессии" Binding="{Binding SessionDuration}" Width="150"/>
+                <DataGridTemplateColumn Header="Действия" Width="600">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

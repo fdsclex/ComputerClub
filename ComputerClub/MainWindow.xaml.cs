@@ -46,7 +46,8 @@ namespace ComputerClub
             e.Content is ReportsPage ||
             e.Content is SessionsPage ||
             e.Content is ClubMapPage ||
-            e.Content is ClientDashboardPage)
+            e.Content is ClientShellPage ||
+            e.Content is ClientCabinetPage)
             {
                 btnBack.Visibility = Visibility.Collapsed;
             }
@@ -72,7 +73,8 @@ namespace ComputerClub
             bool showPc = AppConfig.IsOnSite && AppConfig.DeviceNumber.HasValue &&
                           (MainFrame.Content is ComputerClub.Navigation.ClientLoginPage ||
                            MainFrame.Content is ComputerClub.Navigation.ClientRegistrationPage ||
-                           MainFrame.Content is ComputerClub.ClientPanel.ClientDashboardPage);
+                           MainFrame.Content is ComputerClub.ClientPanel.ClientShellPage ||
+                           MainFrame.Content is ComputerClub.ClientPanel.ClientCabinetPage);
 
             tbPcNumber.Visibility = showPc ? Visibility.Visible : Visibility.Collapsed;
 
