@@ -2,75 +2,95 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Магазин">
-
     <Grid Background="#0F0F1A" Margin="20">
-        <StackPanel>
-            <TextBlock Text="Магазин" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок + кнопка корзины -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <TextBlock Text="Магазин"
                        FontSize="28" FontWeight="Bold"
                        Foreground="{StaticResource AccentYellow}"
-                       Margin="0,0,0,24"/>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" 
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="0,0,8,0">
-                <ItemsControl x:Name="icItems">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="3" HorizontalAlignment="Center"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border CornerRadius="12" Width="260" Height="340" Margin="12">
-                                <!-- Фон задаём только один раз — градиентом -->
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Color="#1A1A2E" Offset="0"/>
-                                        <GradientStop Color="#121212" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-
-                                <!-- Тень (DropShadowEffect) -->
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#000000" Direction="320" ShadowDepth="4" BlurRadius="12" Opacity="0.4"/>
-                                </Border.Effect>
-
-                                <StackPanel>
-                                    <!-- Фото-заглушка -->
-                                    <Border Background="#0F0F1A" CornerRadius="12,12,0,0" Height="180">
-                                        <Image Source="pack://application:,,,/Resources/food_placeholder.png" 
-                       Stretch="UniformToFill"/>
-                                    </Border>
-
-                                    <!-- Название -->
-                                    <TextBlock Text="{Binding Name}"
-                       FontSize="16" FontWeight="SemiBold"
-                       Foreground="White"
-                       TextWrapping="Wrap" 
-                       TextAlignment="Center"
-                       Margin="12,12,12,4"/>
-
-                                    <!-- Цена -->
-                                    <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} ₽'}"
-                       FontSize="20" FontWeight="Bold"
-                       Foreground="{StaticResource AccentYellow}"
-                       TextAlignment="Center"
-                       Margin="0,0,0,12"/>
-
-                                    <!-- Кнопка КУПИТЬ -->
-                                    <Button Content="КУПИТЬ"
+                       VerticalAlignment="Center"/>
+            <Button x:Name="btnCart"
+                    Content="Корзина"
                     Style="{StaticResource YellowActionButton}"
                     Width="180" Height="48"
-                    HorizontalAlignment="Center"
-                    Click="BuyItem_Click"
-                    Tag="{Binding MenuItemID}"/>
+                    Margin="30,0,0,0"
+                    Click="ShowCart_Click"/>
+        </StackPanel>
+
+        <!-- Список товаров -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="0,0,8,0">
+            <ItemsControl x:Name="icItems">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="3" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border CornerRadius="12" Width="340" Height="420" Margin="16">
+                            <!-- ← было 280, стало 340 -->
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="#222233" Offset="0"/>
+                                    <GradientStop Color="#1A1A2E" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000" Direction="320" ShadowDepth="6" BlurRadius="16" Opacity="0.5"/>
+                            </Border.Effect>
+
+                            <Border Padding="16,12,16,8">
+                                <StackPanel>
+                                    <Border Background="#181828" CornerRadius="12,12,0,0" Height="200">
+                                        <Image Source="pack://application:,,,/Resources/food_placeholder.png"
+                                               Stretch="Uniform"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="16" FontWeight="SemiBold"
+                                               Foreground="White"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"
+                                               Margin="0,8,0,4"/>
+
+                                    <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} ₽'}"
+                                               FontSize="20" FontWeight="Bold"
+                                               Foreground="{StaticResource AccentYellow}"
+                                               TextAlignment="Center"
+                                               Margin="0,0,0,8"/>
+
+                                    <!-- Количество + кнопка -->
+                                    <StackPanel Orientation="Horizontal" 
+                                                HorizontalAlignment="Center" 
+                                                Margin="0,8,0,8">
+                                        <TextBox x:Name="tbQuantity" 
+                                                 Text="1" 
+                                                 Width="50"              
+                                            Style="{StaticResource DarkInput}" 
+                                                 Margin="0,0,12,0"/>
+                                            <Button Content="В корзину"
+                                                Style="{StaticResource FunButton}"
+                                                Width="200" Height="48"   
+                                                Click="AddToCart_Click"
+                                                Tag="{Binding MenuItemID}"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Page>

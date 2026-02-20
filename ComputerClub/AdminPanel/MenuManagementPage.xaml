@@ -2,7 +2,6 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Меню и заказы">
-
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,7 +28,6 @@
 
         <!-- Фильтры -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
-            <!-- Поиск по названию -->
             <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
                 <TextBlock Text="Поиск по названию:"
                            Style="{StaticResource FieldLabel}"
@@ -40,8 +38,6 @@
                          Style="{StaticResource DarkInput}"
                          TextChanged="tbSearchName_TextChanged"/>
             </StackPanel>
-
-            <!-- Фильтр по типу -->
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Тип товара:"
                            Style="{StaticResource FieldLabel}"
@@ -77,14 +73,12 @@
                           AlternatingRowBackground="#161616"
                           BorderThickness="0"
                           RowHeaderWidth="0">
-
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="Height" Value="Auto"/>
                             <Setter Property="MinHeight" Value="36"/>
                         </Style>
                     </DataGrid.RowStyle>
-
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID заказа" Binding="{Binding OrderID}" Width="80"/>
                         <DataGridTextColumn Header="Клиент" Binding="{Binding ClientFullName}" Width="220">
@@ -103,12 +97,21 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount, StringFormat='{}{0:N0} ₽'}" Width="110"/>
-                        <DataGridTemplateColumn Header="Действия" Width="200">
+                        <DataGridTemplateColumn Header="Действия" Width="300">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Удалить"
-                                            Style="{StaticResource FunButton}"
-                                            Click="DeleteOrder_Click"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Удалить"
+                                                Margin="4,2"
+                                                Style="{StaticResource FunButton}"
+                                                Click="DeleteOrder_Click"/>
+                                        <!-- Кнопка "Отдал заказ" -->
+                                        <Button x:Name="btnMarkDelivered"
+                                                Content="Отдал заказ"
+                                                Margin="4,2"
+                                                Style="{StaticResource FunButton}"
+                                                Click="MarkDelivered_Click"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -132,14 +135,12 @@
                           AlternatingRowBackground="#161616"
                           BorderThickness="0"
                           RowHeaderWidth="0">
-
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="Height" Value="Auto"/>
                             <Setter Property="MinHeight" Value="36"/>
                         </Style>
                     </DataGrid.RowStyle>
-
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" Binding="{Binding MenuItemID}" Width="60"/>
                         <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="280">
