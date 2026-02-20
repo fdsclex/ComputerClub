@@ -1,28 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ComputerClub.ClientPanel
 {
-    /// <summary>
-    /// Логика взаимодействия для CabinetLoyaltyPage.xaml
-    /// </summary>
     public partial class CabinetLoyaltyPage : Page
     {
         public CabinetLoyaltyPage()
         {
             InitializeComponent();
+            Loaded += CabinetLoyaltyPage_Loaded;
+        }
+
+        private void CabinetLoyaltyPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadTransactions();
+        }
+
+        private void LoadTransactions()
+        {
+            if (!AppConfig.CurrentClientId.HasValue)
+            {
+                MessageBox.Show("Клиент не авторизован.", "Ошибка");
+                dgTransactions.ItemsSource = null;
+                return;
+            }
+
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    int clientId = AppConfig.CurrentClientId.Value;
+
+                    var transactions = ctx.Transactions
+                        .Where(t => t.ClientID == clientId)
+                        .OrderByDescending(t => t.TransactionDate)
+                        .Select(t => new
+                        {
+                            t.TransactionDate,
+                            t.Type,
+                            t.Amount
+                        })
+                        .ToList();
+
+                    
+
+                    dgTransactions.ItemsSource = transactions;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки:\n{ex.Message}\n\nДетали:\n{ex.InnerException?.Message ?? "нет"}", "Ошибка");
+                dgTransactions.ItemsSource = null;
+            }
         }
     }
 }

@@ -114,6 +114,12 @@ namespace ComputerClub.AdminPanel
             {
                 decimal amount = inputWindow.Result;
 
+                if (amount <= 0)
+                {
+                    MessageBox.Show("Сумма должна быть больше 0.", "Ошибка");
+                    return;
+                }
+
                 try
                 {
                     using (var ctx = new Entities())
@@ -121,8 +127,21 @@ namespace ComputerClub.AdminPanel
                         var client = ctx.Clients.Find(sel.ClientID);
                         if (client != null)
                         {
+                            // Пополняем баланс
                             client.Balance += amount;
+
+                            // Создаём запись в транзакциях
+                            ctx.Transactions.Add(new Transactions
+                            {
+                                ClientID = client.ClientID,
+                                Amount = amount,
+                                Type = "Deposit",  // ← именно этот тип должен быть
+                                TransactionDate = DateTime.Now,
+                                // Description = $"Пополнение администратором на {amount:N0} ₽"  // если хочешь описание
+                            });
+
                             ctx.SaveChanges();
+
                             MessageBox.Show($"Баланс пополнен на {amount:N0} ₽.\nНовый баланс: {client.Balance:N0} ₽.");
                             LoadClients(tbSearchPhone.Text.Trim());
                         }
@@ -130,7 +149,7 @@ namespace ComputerClub.AdminPanel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка пополнения:\n{ex.Message}");
+                    MessageBox.Show($"Ошибка пополнения:\n{ex.Message}", "Ошибка");
                 }
             }
         }

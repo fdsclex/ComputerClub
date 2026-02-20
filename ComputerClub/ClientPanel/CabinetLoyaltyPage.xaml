@@ -1,14 +1,108 @@
 ﻿<Page x:Class="ComputerClub.ClientPanel.CabinetLoyaltyPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:ComputerClub.ClientPanel"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="CabinetLoyaltyPage">
+      Title="Программа лояльности">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <Grid>
-        
+        <!-- Заголовок страницы -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+            <TextBlock Text="История начислений и списаний"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource AccentYellow}"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Таблица -->
+        <DataGrid x:Name="dgTransactions" Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  CanUserSortColumns="True"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{StaticResource BorderInput}"
+                  RowBackground="{StaticResource BgInput}"
+                  AlternatingRowBackground="#161616"
+                  BorderThickness="0"
+                  RowHeaderWidth="0"
+                  CanUserResizeColumns="False">
+
+            <!-- Высота строк -->
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Height" Value="Auto"/>
+                    <Setter Property="MinHeight" Value="36"/>
+                </Style>
+            </DataGrid.RowStyle>
+
+            <!-- Единый стиль для ВСЕХ заголовков столбцов -->
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#0F0F1A"/>
+                    <Setter Property="Foreground" Value="{StaticResource AccentYellow}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Padding" Value="12,8"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="Height" Value="40"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.Columns>
+
+                <!-- Дата -->
+                <DataGridTextColumn Header="Дата"
+                                    Binding="{Binding TransactionDate, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                                    Width="160">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="12,4,8,4"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Наименование -->
+                <DataGridTextColumn Header="Наименование"
+                                    Binding="{Binding Type}"
+                                    Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource TransactionTypeText}">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="12,4,8,4"/>
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Сумма -->
+                <DataGridTextColumn Header="Сумма"
+                                    Binding="{Binding Amount, StringFormat='{}{0:N0} ₽'}"
+                                    Width="140">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="8,4"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Page>

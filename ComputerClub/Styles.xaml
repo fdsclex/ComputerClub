@@ -364,7 +364,52 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <!-- Стиль для текста типа транзакции (меняется только цвет текста) -->
+    <Style x:Key="TransactionTypeText" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Margin" Value="4,2"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <!-- серый по умолчанию -->
 
+        <Style.Triggers>
+            <!-- Депозит / пополнение -->
+            <DataTrigger Binding="{Binding Type}" Value="Deposit">
+                <Setter Property="Foreground" Value="{StaticResource SuccessGreen}"/>
+            </DataTrigger>
+
+            <!-- Списание / Withdrawal -->
+            <DataTrigger Binding="{Binding Type}" Value="Withdrawal">
+                <Setter Property="Foreground" Value="{StaticResource ErrorRed}"/>
+            </DataTrigger>
+
+            <!-- Покупка еды / FoodOrder -->
+            <DataTrigger Binding="{Binding Type}" Value="FoodOrder">
+                <Setter Property="Foreground" Value="{StaticResource WarningOrange}"/>
+            </DataTrigger>
+
+            <!-- Возврат / Refund -->
+            <DataTrigger Binding="{Binding Type}" Value="Refund">
+                <Setter Property="Foreground" Value="{StaticResource InfoBlue}"/>
+            </DataTrigger>
+
+            <!-- Hold / заморозка -->
+            <DataTrigger Binding="{Binding Type}" Value="Hold">
+                <Setter Property="Foreground" Value="#6A1B9A"/>
+                <!-- фиолетовый -->
+            </DataTrigger>
+
+            <!-- Другие / неизвестные типы -->
+            <DataTrigger Binding="{Binding Type}" Value="">
+                <Setter Property="Foreground" Value="#AAAAAA"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="DarkComboBox" TargetType="ComboBox">
         <Setter Property="Background" Value="{StaticResource BgInput}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -532,7 +577,6 @@
         </Setter>
     </Style>
 
-    <!-- Кнопка Завершить сессию (красная) -->
     <!-- Кнопка Завершить сессию (красная, с эффектами) -->
     <Style x:Key="FinishSessionButton" TargetType="Button">
         <Setter Property="Background" Value="#EF5350"/>

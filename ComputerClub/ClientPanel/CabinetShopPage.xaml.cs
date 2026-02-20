@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using System.Data.Entity; // для .Include в EF6
+using System.Data.Entity;
 
 namespace ComputerClub.ClientPanel
 {
@@ -37,7 +37,6 @@ namespace ComputerClub.ClientPanel
                             m.Price
                         })
                         .ToList();
-
                     icItems.ItemsSource = items;
                 }
             }
@@ -53,7 +52,6 @@ namespace ComputerClub.ClientPanel
             {
                 var parent = btn.Parent as StackPanel;
                 var tbQuantity = parent?.Children.OfType<TextBox>().FirstOrDefault();
-
                 if (tbQuantity == null || !int.TryParse(tbQuantity.Text, out int quantity) || quantity < 1)
                 {
                     MessageBox.Show("Укажите количество от 1", "Ошибка");
@@ -122,9 +120,7 @@ namespace ComputerClub.ClientPanel
                         }
 
                         ctx.SaveChanges();
-
                         MessageBox.Show($"Добавлено в корзину: {item.Name} × {quantity}", "Успех");
-
                         UpdateCartButton();
                     }
                 }
@@ -178,20 +174,17 @@ namespace ComputerClub.ClientPanel
                 MessageBox.Show("Клиент не авторизован.", "Ошибка");
                 return;
             }
-
             try
             {
                 using (var ctx = new Entities())
                 {
                     var cartOrder = ctx.Orders
                         .FirstOrDefault(o => o.ClientID == AppConfig.CurrentClientId.Value && o.Status == "Pending");
-
                     if (cartOrder == null || !ctx.OrderItems.Any(oi => oi.OrderID == cartOrder.OrderID))
                     {
                         MessageBox.Show("Корзина пуста.", "Корзина");
                         return;
                     }
-
                     var window = new Window
                     {
                         WindowStyle = WindowStyle.None,
@@ -202,12 +195,10 @@ namespace ComputerClub.ClientPanel
                         Background = new SolidColorBrush(Color.FromRgb(15, 15, 26)),
                         ResizeMode = ResizeMode.NoResize
                     };
-
                     var grid = new Grid { Margin = new Thickness(20) };
                     grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                     grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
                     grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
                     var title = new TextBlock
                     {
                         Text = "Корзина",
@@ -218,7 +209,6 @@ namespace ComputerClub.ClientPanel
                     };
                     Grid.SetRow(title, 0);
                     grid.Children.Add(title);
-
                     var list = new ListView
                     {
                         ItemsSource = ctx.OrderItems
@@ -228,16 +218,13 @@ namespace ComputerClub.ClientPanel
                         Background = new SolidColorBrush(Color.FromRgb(26, 26, 46)),
                         Foreground = new SolidColorBrush(Colors.White)
                     };
-
                     list.ItemTemplate = new DataTemplate
                     {
                         VisualTree = new FrameworkElementFactory(typeof(StackPanel))
                     };
-
                     var spFactory = list.ItemTemplate.VisualTree;
                     spFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
                     spFactory.SetValue(StackPanel.MarginProperty, new Thickness(0, 4, 0, 4));
-
                     var nameTb = new FrameworkElementFactory(typeof(TextBlock));
                     nameTb.SetValue(TextBlock.FontSizeProperty, 14.0);
                     nameTb.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
@@ -245,17 +232,15 @@ namespace ComputerClub.ClientPanel
                     nameTb.SetValue(TextBlock.WidthProperty, 220.0);
                     nameTb.SetBinding(TextBlock.TextProperty, new Binding("MenuItems.Name"));
                     spFactory.AppendChild(nameTb);
-
                     var priceTb = new FrameworkElementFactory(typeof(TextBlock));
                     priceTb.SetValue(TextBlock.WidthProperty, 100.0);
                     priceTb.SetBinding(TextBlock.TextProperty, new Binding("Subtotal") { StringFormat = "{0:N0} ₽" });
                     spFactory.AppendChild(priceTb);
-
                     var qtyTb = new FrameworkElementFactory(typeof(TextBlock));
                     qtyTb.SetValue(TextBlock.WidthProperty, 60.0);
                     qtyTb.SetBinding(TextBlock.TextProperty, new Binding("Quantity"));
                     spFactory.AppendChild(qtyTb);
-
+                    // totalText объявлен ДО лямбды удаления — порядок важен!
                     var totalText = new TextBlock
                     {
                         Text = $"Итого: {cartOrder.TotalAmount:N0} ₽",
@@ -264,7 +249,7 @@ namespace ComputerClub.ClientPanel
                         Foreground = new SolidColorBrush(Colors.Yellow),
                         Margin = new Thickness(0, 16, 0, 0)
                     };
-
+                    // Кнопка удаления — здесь totalText ещё не объявлен, но мы его используем после
                     var removeBtn = new FrameworkElementFactory(typeof(Button));
                     removeBtn.SetValue(Button.ContentProperty, "Удалить");
                     removeBtn.SetValue(Button.WidthProperty, 80.0);
@@ -282,14 +267,12 @@ namespace ComputerClub.ClientPanel
                                 .ToList();
                             list.Items.Refresh();
                             UpdateCartButton();
-                            totalText.Text = $"Итого: {cartOrder.TotalAmount:N0} ₽";
+                            totalText.Text = $"Итого: {cartOrder.TotalAmount:N0} ₽"; // ← работает, потому что totalText уже объявлен ниже
                         }
                     }));
                     spFactory.AppendChild(removeBtn);
-
                     Grid.SetRow(list, 1);
                     grid.Children.Add(list);
-
                     var bottom = new StackPanel { Orientation = Orientation.Horizontal };
                     var cancelBtn = new Button
                     {
@@ -300,7 +283,6 @@ namespace ComputerClub.ClientPanel
                         Style = (Style)FindResource("FunButton")
                     };
                     cancelBtn.Click += (s, args) => window.Close();
-
                     var confirmBtn = new Button
                     {
                         Content = "Оформить заказ",
@@ -310,16 +292,13 @@ namespace ComputerClub.ClientPanel
                         Margin = new Thickness(0, 16, 0, 0)
                     };
                     confirmBtn.Click += (s, args) => ConfirmOrder(window, cartOrder.OrderID);
-
                     bottom.Children.Add(cancelBtn);
                     bottom.Children.Add(confirmBtn);
-
                     var bottomPanel = new StackPanel { Orientation = Orientation.Vertical };
                     bottomPanel.Children.Add(totalText);
                     bottomPanel.Children.Add(bottom);
                     Grid.SetRow(bottomPanel, 2);
                     grid.Children.Add(bottomPanel);
-
                     window.Content = grid;
                     window.ShowDialog();
                 }
@@ -346,36 +325,44 @@ namespace ComputerClub.ClientPanel
                     var client = ctx.Clients.Find(AppConfig.CurrentClientId.Value);
                     if (client == null) throw new Exception("Клиент не найден");
 
-                    if (client.Balance < order.TotalAmount)
-                        throw new Exception($"Недостаточно средств: требуется {order.TotalAmount:N0} ₽");
+                    // Безопасно берём значения (но TotalAmount уже не nullable)
+                    decimal orderAmount = order.TotalAmount; // ← убрали ??, т.к. поле NOT NULL
+                    decimal clientBalance = client.Balance ?? 0m; // ← Balance может быть null, оставляем ??
 
-                    // Списываем деньги сразу
-                    client.Balance -= order.TotalAmount;
+                    if (clientBalance < orderAmount)
+                    {
+                        decimal shortage = orderAmount - clientBalance;
+                        throw new Exception($"Недостаточно средств.\n" +
+                                            $"Требуется: {orderAmount:N0} ₽\n" +
+                                            $"На балансе: {clientBalance:N0} ₽\n" +
+                                            $"Не хватает: {shortage:N0} ₽");
+                    }
+
+                    // Списываем деньги
+                    client.Balance = clientBalance - orderAmount;
 
                     // Создаём транзакцию
                     ctx.Transactions.Add(new Transactions
                     {
                         ClientID = client.ClientID,
                         OrderID = order.OrderID,
-                        Amount = -order.TotalAmount,
+                        Amount = -orderAmount,
                         Type = "FoodOrder",
                         TransactionDate = DateTime.Now
                     });
 
-                    // Меняем статус на "Processing"
+                    // Меняем статус
                     order.Status = "Processing";
-
                     ctx.SaveChanges();
 
-                    MessageBox.Show($"Заказ №{order.OrderID} оплачен!\nСписано: {order.TotalAmount:N0} ₽\nОжидайте доставки.", "Успех");
-
+                    MessageBox.Show($"Заказ №{order.OrderID} оплачен!\nСписано: {orderAmount:N0} ₽\nОжидайте доставки.", "Успех");
                     window.Close();
                     UpdateCartButton();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка оплаты");
+                MessageBox.Show(ex.Message, "Ошибка оформления");
             }
         }
     }
