@@ -31,7 +31,7 @@ namespace ComputerClub.ClientPanel
                     var client = ctx.Clients.Find(AppConfig.CurrentClientId.Value);
                     if (client != null)
                     {
-                        MessageBox.Show($"Ваш текущий баланс: {client.Balance:N0} ₽\n\nБонусный баланс: 0 ₽",
+                        MessageBox.Show($"Ваш текущий баланс: {client.Balance:N0} ₽",
                                         "Баланс", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else

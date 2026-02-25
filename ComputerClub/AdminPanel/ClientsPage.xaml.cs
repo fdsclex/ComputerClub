@@ -110,47 +110,63 @@ namespace ComputerClub.AdminPanel
             string currentBalanceText = $"Текущий баланс: {sel.Balance:N0} ₽";
 
             var inputWindow = new InputBoxWindow(title, "100", currentBalanceText);
-            if (inputWindow.ShowDialog() == true)
+            if (inputWindow.ShowDialog() != true) return;
+
+            decimal amount = inputWindow.Result;
+            if (amount <= 0)
             {
-                decimal amount = inputWindow.Result;
+                MessageBox.Show("Сумма должна быть больше 0.", "Ошибка");
+                return;
+            }
 
-                if (amount <= 0)
+            try
+            {
+                using (var ctx = new Entities())
                 {
-                    MessageBox.Show("Сумма должна быть больше 0.", "Ошибка");
-                    return;
-                }
-
-                try
-                {
-                    using (var ctx = new Entities())
+                    var client = ctx.Clients.Find(sel.ClientID);
+                    if (client == null)
                     {
-                        var client = ctx.Clients.Find(sel.ClientID);
-                        if (client != null)
-                        {
-                            // Пополняем баланс
-                            client.Balance += amount;
-
-                            // Создаём запись в транзакциях
-                            ctx.Transactions.Add(new Transactions
-                            {
-                                ClientID = client.ClientID,
-                                Amount = amount,
-                                Type = "Deposit",  // ← именно этот тип должен быть
-                                TransactionDate = DateTime.Now,
-                                // Description = $"Пополнение администратором на {amount:N0} ₽"  // если хочешь описание
-                            });
-
-                            ctx.SaveChanges();
-
-                            MessageBox.Show($"Баланс пополнен на {amount:N0} ₽.\nНовый баланс: {client.Balance:N0} ₽.");
-                            LoadClients(tbSearchPhone.Text.Trim());
-                        }
+                        MessageBox.Show("Клиент не найден в базе.", "Ошибка");
+                        return;
                     }
+
+                    // Пополняем баланс
+                    client.Balance += amount;
+
+                    // Создаём запись в транзакциях
+                    ctx.Transactions.Add(new Transactions
+                    {
+                        ClientID = client.ClientID,
+                        Amount = amount,
+                        Type = "Deposit",
+                        TransactionDate = DateTime.Now,
+                    });
+
+                    ctx.Notifications.Add(new Notifications
+                    {
+                        ClientID = client.ClientID,
+                        Title = "Баланс пополнен",
+                        Message = $"Ваш баланс пополнен на {amount:N0} ₽ администратором.\n" +
+                                  $"Текущий баланс: {client.Balance:N0} ₽",
+                        Type = "BalanceReplenished",   // или "AdminDeposit", "BalanceChange"
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+
+                    ctx.SaveChanges();
+
+                    MessageBox.Show(
+                        $"Баланс пополнен на {amount:N0} ₽.\n" +
+                        $"Новый баланс: {client.Balance:N0} ₽.\n" +
+                        "Клиент получил уведомление.",
+                        "Успех");
+
+                    LoadClients(tbSearchPhone.Text.Trim());
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка пополнения:\n{ex.Message}", "Ошибка");
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка пополнения:\n{ex.Message}", "Ошибка");
             }
         }
     }

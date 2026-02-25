@@ -28,7 +28,7 @@ namespace ComputerClub.AdminPanel
                 using (var ctx = new Entities())
                 {
                     var activeOrders = ctx.Orders
-                        .Where(o => o.OrderDate >= DateTime.Today && o.Status != "Delivered" && o.Status != "Cancelled")
+                        .Where(o => o.Status == "Pending" || o.Status == "Processing")  // ← только активные
                         .Select(o => new
                         {
                             o.OrderID,
@@ -37,24 +37,31 @@ namespace ComputerClub.AdminPanel
                             o.Status,
                             o.TotalAmount
                         })
+                        .OrderByDescending(o => o.OrderDate)
                         .ToList();
 
                     dgActiveOrders.ItemsSource = activeOrders;
 
-                    // Показываем/скрываем кнопку "Отдал заказ" для строк со статусом "Processing"
+                    // Показываем/скрываем кнопку "Отдал заказ"
                     foreach (var row in dgActiveOrders.Items)
                     {
                         var rowContainer = dgActiveOrders.ItemContainerGenerator.ContainerFromItem(row) as DataGridRow;
                         if (rowContainer == null) continue;
 
-                        dynamic item = row;
-                        var actionsPanel = FindVisualChild<StackPanel>(rowContainer, "actionsPanel"); // если нужно искать по имени
+                        var statusProp = row.GetType().GetProperty("Status");
+                        string status = statusProp?.GetValue(row)?.ToString();
+
+                        var actionsPanel = FindVisualChild<StackPanel>(rowContainer, "actionsPanel");
                         if (actionsPanel == null) continue;
 
-                        var btnMarkDelivered = actionsPanel.Children.OfType<Button>().FirstOrDefault(b => b.Content.ToString() == "Отдал заказ");
+                        var btnMarkDelivered = actionsPanel.Children.OfType<Button>()
+                            .FirstOrDefault(b => b.Content?.ToString() == "Отдал заказ");
+
                         if (btnMarkDelivered != null)
                         {
-                            btnMarkDelivered.Visibility = item.Status.ToString() == "Processing" ? Visibility.Visible : Visibility.Collapsed;
+                            btnMarkDelivered.Visibility = status == "Processing"
+                                ? Visibility.Visible
+                                : Visibility.Collapsed;
                         }
                     }
 
@@ -74,7 +81,7 @@ namespace ComputerClub.AdminPanel
                     _allMenuItems = menuItems;
                     ApplyMenuFilters();
 
-                    tbInfo.Text = $"Активных заказов сегодня: {activeOrders.Count} | Товаров в меню: {menuItems.Count}";
+                    tbInfo.Text = $"Активных заказов: {activeOrders.Count} | Товаров в меню: {menuItems.Count}";
                 }
             }
             catch (Exception ex)
@@ -132,7 +139,30 @@ namespace ComputerClub.AdminPanel
         {
             ApplyMenuFilters();
         }
-
+        private void CreateNotification(int clientId, string title, string message, string type)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    ctx.Notifications.Add(new Notifications
+                    {
+                        ClientID = clientId,
+                        Title = title,
+                        Message = message,
+                        Type = type,
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Можно логировать, но не показывать пользователю
+                Console.WriteLine($"Ошибка создания уведомления: {ex.Message}");
+            }
+        }
         private void DeleteOrder_Click(object sender, RoutedEventArgs e)
         {
             if (dgActiveOrders.SelectedItem == null)
@@ -168,14 +198,15 @@ namespace ComputerClub.AdminPanel
                         MessageBox.Show("Заказ не найден или уже удалён.", "Ошибка");
                         return;
                     }
-
-                    // ───────────────────────────────────────────────
-                    // Возврат денег, если заказ уже был доставлен (и деньги списаны триггером)
-                    // ───────────────────────────────────────────────
-                    if (order.Status == "Delivered" && order.TotalAmount > 0)
+                    CreateNotification(
+                        order.ClientID,
+                        "Заказ отменён",
+                        $"Ваш заказ №{order.OrderID} отменён администратором.",
+                        "OrderCancelled"
+                    );
+                    if (order.TotalAmount > 0 && order.Status != "Pending")
                     {
                         var client = order.Clients ?? ctx.Clients.Find(order.ClientID);
-
                         if (client != null)
                         {
                             client.Balance += order.TotalAmount;
@@ -184,10 +215,9 @@ namespace ComputerClub.AdminPanel
                             {
                                 ClientID = client.ClientID,
                                 OrderID = order.OrderID,
-                                Amount = order.TotalAmount,     // положительная = возврат
-                                Type = "Refund_Deleted",
+                                Amount = order.TotalAmount,          // положительная сумма = возврат
+                                Type = "Refund",
                                 TransactionDate = DateTime.Now
-                                // EmployeeID = текущий админ, если нужно
                             });
 
                             MessageBox.Show(
@@ -201,11 +231,6 @@ namespace ComputerClub.AdminPanel
                             MessageBox.Show("Клиент не найден — возврат не выполнен.", "Предупреждение");
                         }
                     }
-
-                    // ───────────────────────────────────────────────
-                    // Удаляем связанные записи
-                    // ───────────────────────────────────────────────
-
                     if (order.OrderItems?.Any() == true)
                     {
                         ctx.OrderItems.RemoveRange(order.OrderItems);
@@ -224,9 +249,6 @@ namespace ComputerClub.AdminPanel
 
                     ctx.SaveChanges();
 
-                    // ───────────────────────────────────────────────
-                    // Обновляем таблицу активных заказов
-                    // ───────────────────────────────────────────────
                     var activeOrders = ctx.Orders
                         .Include(o => o.Clients)
                         .Where(o => o.Status == "Pending" || o.Status == "Processing")
@@ -262,6 +284,7 @@ namespace ComputerClub.AdminPanel
                 MessageBox.Show("Ошибка:\n" + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+       
         private void MarkDelivered_Click(object sender, RoutedEventArgs e)
         {
             var selected = dgActiveOrders?.SelectedItem;
@@ -286,6 +309,10 @@ namespace ComputerClub.AdminPanel
                         if (order != null && order.Status == "Processing")
                         {
                             order.Status = "Delivered";
+                            CreateNotification(order.ClientID,
+                                       "Заказ доставлен",
+                                       $"Ваш заказ №{order.OrderID} успешно доставлен! Приятного аппетита!",
+                                       "OrderDelivered");
                             ctx.SaveChanges();
                             MessageBox.Show("Заказ отмечен как доставленный.");
                             LoadData();

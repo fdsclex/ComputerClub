@@ -308,7 +308,30 @@ namespace ComputerClub.ClientPanel
                 MessageBox.Show(ex.Message, "Ошибка");
             }
         }
-
+        private void CreateNotification(int clientId, string title, string message, string type)
+        {
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    ctx.Notifications.Add(new Notifications
+                    {
+                        ClientID = clientId,
+                        Title = title,
+                        Message = message,
+                        Type = type,
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                    ctx.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Можно логировать, но не показывать пользователю
+                Console.WriteLine($"Ошибка создания уведомления: {ex.Message}");
+            }
+        }
         private void ConfirmOrder(Window window, int orderId)
         {
             try
@@ -354,7 +377,10 @@ namespace ComputerClub.ClientPanel
                     // Меняем статус
                     order.Status = "Processing";
                     ctx.SaveChanges();
-
+                    CreateNotification(client.ClientID,
+                               "Заказ оплачен",
+                               $"Ваш заказ №{order.OrderID} оплачен на сумму {orderAmount:N0} ₽. Ожидайте доставки!",
+                               "OrderPaid");
                     MessageBox.Show($"Заказ №{order.OrderID} оплачен!\nСписано: {orderAmount:N0} ₽\nОжидайте доставки.", "Успех");
                     window.Close();
                     UpdateCartButton();

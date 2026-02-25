@@ -99,7 +99,6 @@
                                 <TextBlock Text="Текущий тариф: Стандарт" FontSize="16" Foreground="{StaticResource AccentYellow}"/>
                                 <TextBlock Text="Скорость: 1 Гбит/с" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
                                 <TextBlock Text="Цена: 100 ₽/час" FontSize="14" Foreground="#AAAAAA"/>
-                                <Button Content="Сменить тариф" Style="{StaticResource YellowActionButton}" Margin="0,16,0,0"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -110,8 +109,6 @@
         <Border Background="#1A1A2E" Grid.Row="2">
             <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Content="Вернуться к столу" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12" Click="BackToShell_Click"/>
-                <Button Content="Выбрать игру" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
-                <Button Content="Сообщить о проблеме" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
                 <Button Content="Перенести за другой ПК" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
                 <Button Content="Начать сессию" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
                 <Button Content="Выйти из аккаунта" Style="{StaticResource FinishSessionButton}" Width="220" Height="80" Margin="12" Click="Logout_Click"/>

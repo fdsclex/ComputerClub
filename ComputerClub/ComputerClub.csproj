@@ -161,6 +161,9 @@
     <Compile Include="AdminPanel\MenuManagementPage.xaml.cs">
       <DependentUpon>MenuManagementPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Notifications.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="OrderItems.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

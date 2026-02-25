@@ -18,7 +18,6 @@ namespace ComputerClub.Navigation
                 MessageBox.Show("Введите корректный номер устройства");
                 return;
             }
-
             using (var ctx = new Entities())
             {
                 var device = ctx.Devices.FirstOrDefault(d => d.DeviceID == deviceId);
@@ -26,8 +25,8 @@ namespace ComputerClub.Navigation
                 {
                     AppConfig.IsOnSite = true;
                     AppConfig.DeviceNumber = deviceId;
-                    AppConfig.DeviceName = device.Name ?? "Устройство";  // имя из БД
-                    AppConfig.DeviceType = device.Type;  // сохраняем тип 'PC' или 'Console'
+                    AppConfig.DeviceName = device.Name ?? "Устройство"; 
+                    AppConfig.DeviceType = device.Type;
 
                     NavigationService.Navigate(new ClientLoginPage());
                 }

@@ -69,6 +69,18 @@
           <Property Name="Description" Type="nvarchar" MaxLength="255" />
           <Property Name="Available" Type="bit" />
         </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="NotificationID" />
+          </Key>
+          <Property Name="NotificationID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientID" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Message" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="IsRead" Type="bit" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" />
+        </EntityType>
         <EntityType Name="OrderItems">
           <Key>
             <PropertyRef Name="OrderItemID" />
@@ -176,6 +188,18 @@
             </Principal>
             <Dependent Role="DeviceGames">
               <PropertyRef Name="GameID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notificat__Clien__2B0A656D">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="ClientID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -380,6 +404,7 @@
           <EntitySet Name="Employees" EntityType="Self.Employees" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Games" EntityType="Self.Games" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MenuItems" EntityType="Self.MenuItems" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="OrderItems" EntityType="Self.OrderItems" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Orders" EntityType="Self.Orders" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reservations" EntityType="Self.Reservations" Schema="dbo" store:Type="Tables" />
@@ -394,6 +419,10 @@
           <AssociationSet Name="FK__DeviceGam__GameI__4AB81AF0" Association="Self.FK__DeviceGam__GameI__4AB81AF0">
             <End Role="Games" EntitySet="Games" />
             <End Role="DeviceGames" EntitySet="DeviceGames" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notificat__Clien__2B0A656D" Association="Self.FK__Notificat__Clien__2B0A656D">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Notifications" EntitySet="Notifications" />
           </AssociationSet>
           <AssociationSet Name="FK__OrderItem__MenuI__6754599E" Association="Self.FK__OrderItem__MenuI__6754599E">
             <End Role="MenuItems" EntitySet="MenuItems" />
@@ -477,6 +506,7 @@
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Balance" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="RegistrationDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Notifications" Relationship="Self.FK__Notificat__Clien__2B0A656D" FromRole="Clients" ToRole="Notifications" />
           <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__ClientID__619B8048" FromRole="Clients" ToRole="Orders" />
           <NavigationProperty Name="Reservations" Relationship="Self.FK__Reservati__Clien__4F7CD00D" FromRole="Clients" ToRole="Reservations" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Sessions__Client__5535A963" FromRole="Clients" ToRole="Sessions" />
@@ -543,6 +573,19 @@
           <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="Available" Type="Boolean" />
           <NavigationProperty Name="OrderItems" Relationship="Self.FK__OrderItem__MenuI__6754599E" FromRole="MenuItems" ToRole="OrderItems" />
+        </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="NotificationID" />
+          </Key>
+          <Property Name="NotificationID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientID" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Message" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsRead" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK__Notificat__Clien__2B0A656D" FromRole="Notifications" ToRole="Clients" />
         </EntityType>
         <EntityType Name="OrderItems">
           <Key>
@@ -647,6 +690,18 @@
           <NavigationProperty Name="Reservations" Relationship="Self.FK__Transacti__Reser__6E01572D" FromRole="Transactions" ToRole="Reservations" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Transacti__Sessi__6D0D32F4" FromRole="Transactions" ToRole="Sessions" />
         </EntityType>
+        <Association Name="FK__Notificat__Clien__2B0A656D">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Orders__ClientID__619B8048">
           <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
           <End Role="Orders" Type="Self.Orders" Multiplicity="*" />
@@ -876,6 +931,7 @@
           <EntitySet Name="Employees" EntityType="Self.Employees" />
           <EntitySet Name="Games" EntityType="Self.Games" />
           <EntitySet Name="MenuItems" EntityType="Self.MenuItems" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" />
           <EntitySet Name="OrderItems" EntityType="Self.OrderItems" />
           <EntitySet Name="Orders" EntityType="Self.Orders" />
           <EntitySet Name="Reservations" EntityType="Self.Reservations" />
@@ -883,6 +939,10 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="Tariffs" EntityType="Self.Tariffs" />
           <EntitySet Name="Transactions" EntityType="Self.Transactions" />
+          <AssociationSet Name="FK__Notificat__Clien__2B0A656D" Association="Self.FK__Notificat__Clien__2B0A656D">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
           <AssociationSet Name="FK__Orders__ClientID__619B8048" Association="Self.FK__Orders__ClientID__619B8048">
             <End Role="Clients" EntitySet="Clients" />
             <End Role="Orders" EntitySet="Orders" />
@@ -1029,6 +1089,19 @@
                 <ScalarProperty Name="Price" ColumnName="Price" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="Available" ColumnName="Available" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="ComputerClubDBModel.Notifications">
+              <MappingFragment StoreEntitySet="Notifications">
+                <ScalarProperty Name="NotificationID" ColumnName="NotificationID" />
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

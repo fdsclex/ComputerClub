@@ -31,6 +31,7 @@ namespace ComputerClub
         public virtual DbSet<Employees> Employees { get; set; }
         public virtual DbSet<Games> Games { get; set; }
         public virtual DbSet<MenuItems> MenuItems { get; set; }
+        public virtual DbSet<Notifications> Notifications { get; set; }
         public virtual DbSet<OrderItems> OrderItems { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Reservations> Reservations { get; set; }

@@ -17,6 +17,7 @@ namespace ComputerClub
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Clients()
         {
+            this.Notifications = new HashSet<Notifications>();
             this.Orders = new HashSet<Orders>();
             this.Reservations = new HashSet<Reservations>();
             this.Sessions = new HashSet<Sessions>();
@@ -32,6 +33,8 @@ namespace ComputerClub
         public Nullable<decimal> Balance { get; set; }
         public Nullable<System.DateTime> RegistrationDate { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Notifications> Notifications { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Orders> Orders { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
