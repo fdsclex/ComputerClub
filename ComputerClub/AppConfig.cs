@@ -7,8 +7,10 @@
         public static string DeviceName { get; set; }
         public static string DeviceType { get; set; } // "PC" или "Console"
         public static int? CurrentClientId { get; set; }
-
-        public static bool IsAuthenticated => CurrentClientId.HasValue;
+        public static int? TariffID { get; set; }
+        public static bool IsSessionActive { get; set; } = false;
+        public static bool IsDeviceSwitchInProgress { get; set; } = false;
+        public static bool NavigateToBookingAfterLogin { get; set; } = false;
 
         public static void Reset()
         {
@@ -18,7 +20,16 @@
             DeviceType = null;
             CurrentClientId = null;
         }
-
+        public static void ResetDeviceOnly()
+        {
+            IsOnSite = false;
+            DeviceNumber = null;
+            DeviceName = null;
+            DeviceType = null;
+            TariffID = null;
+            // CurrentClientId НЕ сбрасываем!
+            // IsDeviceSwitchInProgress можно сбросить позже
+        }
         // Удобный метод для быстрого получения имени устройства
         public static string GetDeviceDisplay()
         {

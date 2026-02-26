@@ -14,11 +14,17 @@ namespace ComputerClub.Navigation
         {
             AppConfig.IsOnSite = false;
             AppConfig.DeviceNumber = null;
+            AppConfig.TariffID = null;
+
+            // Говорим: после логина → сразу в бронь
+            AppConfig.NavigateToBookingAfterLogin = true;
+
             NavigationService.Navigate(new ClientLoginPage());
         }
 
         private void OnSiteButton_Click(object sender, RoutedEventArgs e)
         {
+            // Обычный путь: выбор устройства → логин → кабинет
             NavigationService.Navigate(new DeviceInputPage());
         }
     }

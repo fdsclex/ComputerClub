@@ -383,8 +383,8 @@
                 <Setter Property="Foreground" Value="{StaticResource SuccessGreen}"/>
             </DataTrigger>
 
-            <!-- Списание / Withdrawal -->
-            <DataTrigger Binding="{Binding Type}" Value="Withdrawal">
+            <!-- Списание / SessionWithdrawal -->
+            <DataTrigger Binding="{Binding Type}" Value="SessionWithdrawal">
                 <Setter Property="Foreground" Value="{StaticResource ErrorRed}"/>
             </DataTrigger>
 

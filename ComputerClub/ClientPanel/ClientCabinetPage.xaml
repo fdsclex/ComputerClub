@@ -109,8 +109,8 @@
         <Border Background="#1A1A2E" Grid.Row="2">
             <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Button Content="Вернуться к столу" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12" Click="BackToShell_Click"/>
-                <Button Content="Перенести за другой ПК" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
-                <Button Content="Начать сессию" Style="{StaticResource YellowActionButton}" Width="220" Height="80" Margin="12"/>
+                <Button x:Name="btnSwitchDevice" Content="Перенести за другой ПК" Style="{StaticResource YellowActionButton}" Click="SwitchDevice_Click" Width="220" Height="80" Margin="12"/>
+                <Button x:Name="btnSessionControl" Content="Начать сессию" Style="{StaticResource YellowActionButton}" Click="SessionControl_Click" Width="220" Height="80" Margin="12"/>
                 <Button Content="Выйти из аккаунта" Style="{StaticResource FinishSessionButton}" Width="220" Height="80" Margin="12" Click="Logout_Click"/>
             </WrapPanel>
         </Border>

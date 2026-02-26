@@ -70,6 +70,9 @@
     <Compile Include="AdminPanel\AdminDashboardPage.xaml.cs">
       <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Navigation\BookingPage.xaml.cs">
+      <DependentUpon>BookingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ClientPanel\CabinetLoyaltyPage.xaml.cs">
       <DependentUpon>CabinetLoyaltyPage.xaml</DependentUpon>
     </Compile>
@@ -125,9 +128,6 @@
       <DependentUpon>AdminLoginPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppConfig.cs" />
-    <Compile Include="Navigation\CaptchaWindow.xaml.cs">
-      <DependentUpon>CaptchaWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Navigation\ClientLoginPage.xaml.cs">
       <DependentUpon>ClientLoginPage.xaml</DependentUpon>
     </Compile>
@@ -199,6 +199,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Navigation\BookingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ClientPanel\CabinetLoyaltyPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -224,10 +228,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Navigation\AdminLoginPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Navigation\CaptchaWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
