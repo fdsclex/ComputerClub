@@ -117,12 +117,17 @@
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource StatusTextBlock}"/>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTemplateColumn Header="Действия" Width="200">
+                        <DataGridTemplateColumn Header="Действия" Width="250">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
                                     <Button Content="Отменить"
                                             Style="{StaticResource FunButton}"
                                             Click="CancelReservation_Click"/>
+                                        <Button Content="Начать сессию" 
+                                            Style="{StaticResource FunButton}"
+                                            Click="ActivateReservation_Click"/>         
+                                    </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

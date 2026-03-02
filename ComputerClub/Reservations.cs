@@ -28,6 +28,7 @@ namespace ComputerClub
         public Nullable<System.DateTime> EndTime { get; set; }
         public string Status { get; set; }
         public Nullable<bool> IsPaid { get; set; }
+        public Nullable<decimal> PrepaymentAmount { get; set; }
     
         public virtual Clients Clients { get; set; }
         public virtual Devices Devices { get; set; }

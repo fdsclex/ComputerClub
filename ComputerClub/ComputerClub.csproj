@@ -70,27 +70,6 @@
     <Compile Include="AdminPanel\AdminDashboardPage.xaml.cs">
       <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Navigation\BookingPage.xaml.cs">
-      <DependentUpon>BookingPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\CabinetLoyaltyPage.xaml.cs">
-      <DependentUpon>CabinetLoyaltyPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\CabinetNotificationsPage.xaml.cs">
-      <DependentUpon>CabinetNotificationsPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\CabinetProfilePage.xaml.cs">
-      <DependentUpon>CabinetProfilePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\CabinetShopPage.xaml.cs">
-      <DependentUpon>CabinetShopPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\ClientCabinetPage.xaml.cs">
-      <DependentUpon>ClientCabinetPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ClientPanel\ClientShellPage.xaml.cs">
-      <DependentUpon>ClientShellPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Clients.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -123,6 +102,27 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Navigation\BookingPage.xaml.cs">
+      <DependentUpon>BookingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetLoyaltyPage.xaml.cs">
+      <DependentUpon>CabinetLoyaltyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetNotificationsPage.xaml.cs">
+      <DependentUpon>CabinetNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetProfilePage.xaml.cs">
+      <DependentUpon>CabinetProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\CabinetShopPage.xaml.cs">
+      <DependentUpon>CabinetShopPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\ClientCabinetPage.xaml.cs">
+      <DependentUpon>ClientCabinetPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientPanel\ClientShellPage.xaml.cs">
+      <DependentUpon>ClientShellPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Navigation\AdminLoginPage.xaml.cs">
       <DependentUpon>AdminLoginPage.xaml</DependentUpon>

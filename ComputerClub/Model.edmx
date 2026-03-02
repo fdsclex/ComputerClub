@@ -113,6 +113,7 @@
           <Property Name="EndTime" Type="datetime" />
           <Property Name="Status" Type="nvarchar" MaxLength="20" />
           <Property Name="IsPaid" Type="bit" />
+          <Property Name="PrepaymentAmount" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="Sessions">
           <Key>
@@ -625,6 +626,7 @@
           <Property Name="EndTime" Type="DateTime" Precision="3" />
           <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
           <Property Name="IsPaid" Type="Boolean" />
+          <Property Name="PrepaymentAmount" Type="Decimal" Precision="10" Scale="2" />
           <NavigationProperty Name="Clients" Relationship="Self.FK__Reservati__Clien__4F7CD00D" FromRole="Reservations" ToRole="Clients" />
           <NavigationProperty Name="Devices" Relationship="Self.FK__Reservati__Devic__5070F446" FromRole="Reservations" ToRole="Devices" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Sessions__Reserv__59063A47" FromRole="Reservations" ToRole="Sessions" />
@@ -1138,6 +1140,7 @@
                 <ScalarProperty Name="EndTime" ColumnName="EndTime" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="IsPaid" ColumnName="IsPaid" />
+                <ScalarProperty Name="PrepaymentAmount" ColumnName="PrepaymentAmount" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -2,11 +2,21 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Data.Entity; // для Include, если используешь EF6
 
 namespace ComputerClub.AdminPanel
 {
     public partial class SessionsPage : Page
     {
+        private class ReservationRow
+        {
+            public int ReservationID { get; set; }
+            public string ClientFullName { get; set; }
+            public string DeviceName { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime? EndTime { get; set; }
+            public string Status { get; set; }
+        }
         public SessionsPage()
         {
             InitializeComponent();
@@ -21,9 +31,9 @@ namespace ComputerClub.AdminPanel
                 {
                     // 1. Активные сессии
                     var activeRaw = ctx.Sessions
-                        .Include("Clients")
-                        .Include("Devices")
-                        .Include("Devices.Tariffs")
+                        .Include(s => s.Clients)
+                        .Include(s => s.Devices)
+                        .Include(s => s.Devices.Tariffs)
                         .Where(s => s.EndTime == null && s.Status == "Active")
                         .Select(s => new
                         {
@@ -49,29 +59,29 @@ namespace ComputerClub.AdminPanel
 
                     dgActiveSessions.ItemsSource = active;
 
-                    // 2. Бронирования
+                    // 2. Бронирования (только активные)
                     var reservations = ctx.Reservations
-                        .Include("Clients")
-                        .Include("Devices")
+                        .Include(r => r.Clients)
+                        .Include(r => r.Devices)
                         .Where(r => r.Status == "Pending" || r.Status == "Confirmed")
-                        .Select(r => new
+                        .Select(r => new ReservationRow
                         {
-                            r.ReservationID,
+                            ReservationID = r.ReservationID,
                             ClientFullName = r.Clients.FullName,
                             DeviceName = r.Devices.Name,
-                            r.StartTime,
-                            r.EndTime,
-                            r.Status
+                            StartTime = r.StartTime,
+                            EndTime = r.EndTime,
+                            Status = r.Status
                         })
                         .ToList();
 
                     dgReservations.ItemsSource = reservations;
 
-                    // 3. История сессий
+                    // 3. История сессий (последние 50)
                     var historyRaw = ctx.Sessions
-                        .Include("Clients")
-                        .Include("Devices")
-                        .Include("Devices.Tariffs")
+                        .Include(s => s.Clients)
+                        .Include(s => s.Devices)
+                        .Include(s => s.Devices.Tariffs)
                         .Where(s => s.EndTime != null)
                         .OrderByDescending(s => s.EndTime)
                         .Take(50)
@@ -106,7 +116,8 @@ namespace ComputerClub.AdminPanel
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки:\n{ex.Message}\n\nПодробности:\n{ex.InnerException?.Message ?? "Нет внутренней ошибки"}");
+                MessageBox.Show($"Ошибка загрузки данных:\n{ex.Message}\n\nПодробности:\n{ex.InnerException?.Message ?? "Нет"}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -126,11 +137,15 @@ namespace ComputerClub.AdminPanel
         private void FinishSession_Click(object sender, RoutedEventArgs e)
         {
             if (dgActiveSessions.SelectedItem == null) return;
-            dynamic sel = dgActiveSessions.SelectedItem;
+
+            var sel = (dynamic)dgActiveSessions.SelectedItem;
 
             if (MessageBox.Show($"Завершить сессию #{sel.SessionID} клиента {sel.ClientFullName}?",
-                                "Подтверждение", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                                "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question)
+                != MessageBoxResult.Yes)
+            {
                 return;
+            }
 
             try
             {
@@ -140,45 +155,180 @@ namespace ComputerClub.AdminPanel
                     if (session != null)
                     {
                         session.EndTime = DateTime.Now;
+                        // можно также обновить статус, если нужно
+                        // session.Status = "Completed";
                         ctx.SaveChanges();
-                        MessageBox.Show("Сессия завершена.");
+                        MessageBox.Show("Сессия успешно завершена.", "Успех");
                         LoadData();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка:\n{ex.Message}");
+                MessageBox.Show($"Не удалось завершить сессию:\n{ex.Message}", "Ошибка");
             }
         }
 
         private void CancelReservation_Click(object sender, RoutedEventArgs e)
         {
-            if (dgReservations.SelectedItem == null) return;
-            dynamic sel = dgReservations.SelectedItem;
+            if (dgReservations.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите бронь для отмены.", "Предупреждение");
+                return;
+            }
 
-            if (MessageBox.Show($"Отменить бронь #{sel.ReservationID} клиента {sel.ClientFullName}?",
-                                "Подтверждение", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+            // Теперь безопасное приведение
+            if (!(dgReservations.SelectedItem is ReservationRow sel))
+            {
+                MessageBox.Show("Выбранная строка имеет неверный тип данных.", "Ошибка");
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"Отменить бронь №{sel.ReservationID} клиента {sel.ClientFullName}?",
+                "Подтверждение отмены",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            );
+
+            if (result != MessageBoxResult.Yes)
                 return;
 
             try
             {
                 using (var ctx = new Entities())
                 {
-                    var res = ctx.Reservations.Find(sel.ReservationID);
-                    if (res != null)
+                    var reservation = ctx.Reservations
+                        .Include(r => r.Devices)
+                        .FirstOrDefault(r => r.ReservationID == sel.ReservationID);
+
+                    if (reservation == null)
                     {
-                        res.Status = "Cancelled";
-                        ctx.SaveChanges();
-                        MessageBox.Show("Бронь отменена.");
-                        LoadData();
+                        MessageBox.Show("Бронь не найдена в базе данных.", "Ошибка");
+                        return;
                     }
+
+                    reservation.Status = "Cancelled";
+
+                    bool hasActiveSession = ctx.Sessions
+                        .Any(s => s.DeviceID == reservation.DeviceID &&
+                                  s.EndTime == null &&
+                                  s.Status == "Active");
+
+                    if (!hasActiveSession)
+                    {
+                        var device = reservation.Devices;
+                        if (device != null)
+                        {
+                            device.Status = "Available";
+                        }
+                    }
+
+                    ctx.SaveChanges();
+
+                    MessageBox.Show("Бронь успешно отменена.", "Успех");
+                    LoadData();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка:\n{ex.Message}");
+                MessageBox.Show($"Ошибка при отмене брони:\n{ex.Message}", "Ошибка");
             }
         }
+        private void ActivateReservation_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgReservations.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите бронь для активации.", "Предупреждение");
+                return;
+            }
+
+            var sel = dgReservations.SelectedItem as ReservationRow;
+
+            if (sel == null)
+            {
+                MessageBox.Show("Выбранная строка имеет неверный тип данных.", "Ошибка");
+                return;
+            }
+
+            if (sel.Status != "Pending")
+            {
+                MessageBox.Show("Эту бронь уже нельзя активировать.", "Ошибка");
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"Начать сессию для клиента {sel.ClientFullName}?\nУстройство: {sel.DeviceName}",
+                "Активация брони",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            );
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var reservation = ctx.Reservations
+                        .Include(r => r.Devices)
+                        .FirstOrDefault(r => r.ReservationID == sel.ReservationID);
+
+                    if (reservation == null)
+                    {
+                        MessageBox.Show("Бронь не найдена.", "Ошибка");
+                        return;
+                    }
+
+                    // Создаём активную сессию
+                    var session = new Sessions
+                    {
+                        ClientID = reservation.ClientID,
+                        DeviceID = reservation.DeviceID,
+                        StartTime = DateTime.Now,
+                        Status = "Active"
+                        // Если нужно — добавь TariffID = reservation.Devices.TariffID
+                    };
+
+                    ctx.Sessions.Add(session);
+
+                    // Обновляем статус брони
+                    reservation.Status = "Active";
+
+                    ctx.SaveChanges();
+
+                    MessageBox.Show("Сессия успешно начата!", "Успех");
+                    LoadData();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при активации:\n{ex.Message}", "Ошибка");
+            }
+        }
+        private void FixStuckReservedDevices()
+        {
+            using (var ctx = new Entities())
+            {
+                var stuck = ctx.Devices
+                    .Where(d => d.Status == "Reserved")
+                    .Where(d => !ctx.Reservations.Any(r =>
+                        r.DeviceID == d.DeviceID &&
+                        r.Status == "Pending" || r.Status == "Confirmed"))
+                    .ToList();
+
+                foreach (var device in stuck)
+                {
+                    device.Status = "Available";
+                }
+
+                if (stuck.Any())
+                {
+                    ctx.SaveChanges();
+                    MessageBox.Show($"Освобождено {stuck.Count} залипших устройств.", "Информация");
+                }
+            }
+        }  
     }
 }

@@ -1,31 +1,75 @@
 ﻿using System;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ComputerClub.Navigation
 {
     public partial class BookingPage : Page
     {
+        private int? _selectedDeviceId = null;
+
+        private class DeviceViewModel
+        {
+            public int DeviceID { get; set; }
+            public string Name { get; set; }
+            public string Type { get; set; }
+            public string Specs { get; set; }
+            public string TariffText { get; set; }
+            public bool IsAvailable { get; set; }
+            public string StatusDisplay { get; set; }
+            public string StatusColor { get; set; }
+            public bool IsSelected { get; set; }
+        }
+
         public BookingPage()
         {
             InitializeComponent();
+
+            // Начальные значения времени
+            dpDate.SelectedDate = DateTime.Today;
+            var nowPlus30 = DateTime.Now.AddMinutes(30);
+            tbHour.Text = nowPlus30.Hour.ToString("D2");
+            tbMinute.Text = nowPlus30.Minute.ToString("D2");
+
+            dpDate.SelectedDateChanged += DpDate_SelectedDateChanged;
+            tbHour.TextChanged += TimeField_TextChanged;
+            tbMinute.TextChanged += TimeField_TextChanged;
+            cbDuration.SelectionChanged += CbDuration_SelectionChanged;
+
             Loaded += BookingPage_Loaded;
         }
 
         private void BookingPage_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadAvailableDevices();
+            LoadDevices();
         }
 
-        private void LoadAvailableDevices()
+        private void DpDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateConfirmButton();
+        }
+
+        private void TimeField_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateConfirmButton();
+        }
+
+        private void CbDuration_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateConfirmButton();
+        }
+
+        private void LoadDevices()
         {
             try
             {
                 using (var ctx = new Entities())
                 {
                     var now = DateTime.Now;
-                    var checkUntil = now.AddHours(24); // проверяем брони в ближайшие 24 часа
+                    var checkTo = now.AddHours(24);
 
                     var devices = ctx.Devices
                         .Where(d => d.Status == "Available" || d.Status == "Reserved")
@@ -35,52 +79,50 @@ namespace ComputerClub.Navigation
                             d.Name,
                             d.Type,
                             d.Specs,
-                            d.Status,
                             TariffName = d.Tariffs.Name,
                             TariffPrice = d.Tariffs.PricePerHour,
-
-                            HasActiveReservation = ctx.Reservations
-                                .Any(r => r.DeviceID == d.DeviceID &&
-                                          r.Status == "Pending" &&
-                                          r.StartTime <= checkUntil &&
-                                          r.EndTime > now),
-
-                            HasActiveSession = ctx.Sessions
-                                .Any(s => s.DeviceID == d.DeviceID &&
-                                          s.EndTime == null &&
-                                          s.Status == "Active")
+                            HasReservation = ctx.Reservations.Any(r =>
+                                r.DeviceID == d.DeviceID &&
+                                (r.Status == "Pending" || r.Status == "Confirmed") &&
+                                r.StartTime <= checkTo &&
+                                r.EndTime > now),
+                            HasSession = ctx.Sessions.Any(s =>
+                                s.DeviceID == d.DeviceID &&
+                                s.EndTime == null &&
+                                s.Status == "Active"),
+                            Status = d.Status   // ← добавили это поле
                         })
                         .OrderBy(d => d.Name)
                         .ToList();
 
-                    // Форматируем уже в памяти + добавляем все нужные свойства для XAML
-                    var viewModels = devices.Select(d => new
+                    var vmList = devices.Select(d => new DeviceViewModel
                     {
-                        d.DeviceID,
-                        d.Name,
-                        d.Type,
-                        d.Specs,
+                        DeviceID = d.DeviceID,
+                        Name = d.Name,
+                        Type = d.Type,
+                        Specs = d.Specs,
                         TariffText = d.TariffName != null
-                            ? $"{d.TariffName} — {d.TariffPrice:N0} ₽/час"
+                            ? $"{d.TariffName} — {d.TariffPrice:N0} ₽/ч"
                             : "Тариф не указан",
-                        IsAvailable = d.Status == "Available" &&
-                                      !d.HasActiveReservation &&
-                                      !d.HasActiveSession,
-                        StatusDisplay = d.HasActiveSession ? "Занято (сессия)" :
-                                        d.HasActiveReservation ? "Забронировано" :
-                                        d.Status == "Reserved" ? "Зарезервировано" : "",
-                        // Вместо конвертера — просто строка цвета для TextBlock
-                        StatusColor = d.HasActiveSession ? "#EF5350" :           // красный
-                                      d.HasActiveReservation ? "#FFB74D" :      // оранжевый
-                                      d.Status == "Reserved" ? "#64B5F6" :      // синий
-                                      "#AAAAAA"                                 // серый
+                        IsAvailable = !d.HasSession && !d.HasReservation && d.Status != "Reserved",
+                        StatusDisplay = d.HasSession ? "Занято (сессия активна)" :
+                                        d.HasReservation ? "Забронировано" :
+                                        d.Status == "Reserved" ? "Зарезервировано" :
+                                        "Доступно",
+                        StatusColor = d.HasSession ? "#EF5350" :
+                                      d.HasReservation ? "#FFB74D" :
+                                      d.Status == "Reserved" ? "#64B5F6" :
+                                      "#66BB6A",  // зелёный для свободных
+                        IsSelected = d.DeviceID == _selectedDeviceId.GetValueOrDefault(-1)
                     }).ToList();
 
-                    icDevices.ItemsSource = viewModels;
+                    icDevices.ItemsSource = vmList;
 
-                    tbNoDevices.Visibility = viewModels.Any(d => d.IsAvailable)
+                    tbNoDevices.Visibility = vmList.Any(x => x.IsAvailable)
                         ? Visibility.Collapsed
                         : Visibility.Visible;
+
+                    UpdateConfirmButton();
                 }
             }
             catch (Exception ex)
@@ -90,76 +132,176 @@ namespace ComputerClub.Navigation
             }
         }
 
-        private void BookDevice_Click(object sender, RoutedEventArgs e)
+        private void DeviceCard_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is int deviceId)
+            if (sender is Border border &&
+                border.DataContext is DeviceViewModel vm &&
+                vm.IsAvailable)
             {
-                if (!AppConfig.CurrentClientId.HasValue)
-                {
-                    MessageBox.Show("Для бронирования необходимо войти в аккаунт.",
-                                    "Требуется авторизация",
-                                    MessageBoxButton.OK,
-                                    MessageBoxImage.Warning);
-                    NavigationService?.Navigate(new ClientLoginPage());
-                    return;
-                }
+                _selectedDeviceId = vm.DeviceID;
+                LoadDevices();  // перерисовка для обновления "ВЫБРАНО" и подсветки
+            }
+        }
 
-                try
+        private bool TryParseStartTime(out DateTime start, out DateTime end)
+        {
+            start = default(DateTime);
+            end = default(DateTime);
+
+            if (!dpDate.SelectedDate.HasValue) return false;
+
+            int h, m;
+            if (!int.TryParse(tbHour.Text, out h) || h < 0 || h > 23) return false;
+            if (!int.TryParse(tbMinute.Text, out m) || m < 0 || m > 59) return false;
+
+            m = (m / 30) * 30; // шаг 30 минут
+
+            start = dpDate.SelectedDate.Value.Date.AddHours(h).AddMinutes(m);
+
+            if (start < DateTime.Now.AddMinutes(2)) return false;
+
+            if (cbDuration.SelectedIndex < 0) return false;
+            int hours = cbDuration.SelectedIndex + 1;
+
+            end = start.AddHours(hours);
+            return true;
+        }
+
+        private void UpdateConfirmButton()
+        {
+            bool canBook = _selectedDeviceId.HasValue && TryParseStartTime(out _, out _);
+            btnConfirm.IsEnabled = canBook;
+        }
+
+        private void btnConfirm_Click(object sender, RoutedEventArgs e)
+        {
+            if (!AppConfig.CurrentClientId.HasValue)
+            {
+                MessageBox.Show("Необходимо войти в аккаунт", "Авторизация");
+                NavigationService?.Navigate(new ClientLoginPage());
+                return;
+            }
+
+            if (!TryParseStartTime(out DateTime start, out DateTime end))
+            {
+                MessageBox.Show("Проверьте корректность даты и времени", "Ошибка");
+                return;
+            }
+
+            int devId = _selectedDeviceId.Value;
+            int clientId = AppConfig.CurrentClientId.Value;
+
+            try
+            {
+                using (var ctx = new Entities())
                 {
-                    using (var ctx = new Entities())
+                    var device = ctx.Devices
+                        .Include("Tariffs")
+                        .FirstOrDefault(d => d.DeviceID == devId);
+
+                    if (device == null || device.Tariffs == null)
                     {
-                        var device = ctx.Devices.Find(deviceId);
-                        if (device == null || device.Status != "Available")
-                        {
-                            MessageBox.Show("Устройство больше недоступно или занято.", "Ошибка");
-                            LoadAvailableDevices();
-                            return;
-                        }
+                        MessageBox.Show("Устройство или тариф не найден", "Ошибка");
+                        return;
+                    }
 
-                        var start = DateTime.Now.AddMinutes(10);
-                        var end = start.AddHours(2);
+                    bool overlap = ctx.Reservations.Any(r =>
+                        r.DeviceID == devId &&
+                        r.Status != "Cancelled" &&
+                        r.StartTime < end &&
+                        r.EndTime > start);
 
-                        bool hasConflict = ctx.Reservations
-                            .Any(r => r.DeviceID == deviceId &&
-                                      r.Status != "Cancelled" &&
-                                      ((r.StartTime < end && r.EndTime > start)));
+                    if (!overlap)
+                    {
+                        overlap = ctx.Sessions.Any(s =>
+                            s.DeviceID == devId &&
+                            s.StartTime < end &&
+                            (s.EndTime == null || s.EndTime > start));
+                    }
 
-                        if (hasConflict)
-                        {
-                            MessageBox.Show("На это время уже есть бронь или сессия.", "Конфликт времени");
-                            return;
-                        }
+                    if (overlap)
+                    {
+                        MessageBox.Show("Выбранное время уже занято", "Конфликт времени");
+                        return;
+                    }
 
-                        var reservation = new Reservations
-                        {
-                            ClientID = AppConfig.CurrentClientId.Value,
-                            DeviceID = deviceId,
-                            StartTime = start,
-                            EndTime = end,
-                            Status = "Pending",
-                            IsPaid = false
-                        };
+                    int hours = cbDuration.SelectedIndex + 1;
+                    decimal prepayment = device.Tariffs.PricePerHour * hours * 0.5m;
 
-                        ctx.Reservations.Add(reservation);
-                        device.Status = "Reserved";
+                    var client = ctx.Clients.Find(clientId);
+                    if (client == null)
+                    {
+                        MessageBox.Show("Клиент не найден", "Ошибка");
+                        return;
+                    }
 
-                        ctx.SaveChanges();
+                    if (client.Balance < prepayment)
+                    {
+                        MessageBox.Show($"Недостаточно средств.\nТребуется: {prepayment:N2} ₽\nНа балансе: {client.Balance:N2} ₽",
+                                        "Недостаточно средств", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
 
-                        CreateNotification(AppConfig.CurrentClientId.Value,
-                            "Бронь создана",
-                            $"Вы забронировали {device.Name} ({device.Type})\n" +
-                            $"с {start:dd.MM.yyyy HH:mm} до {end:dd.MM.yyyy HH:mm}",
-                            "ReservationCreated");
+                    client.Balance -= prepayment;
 
-                        MessageBox.Show("Бронь успешно создана!\nОжидайте подтверждения.", "Успех");
+                    var reservation = new Reservations
+                    {
+                        ClientID = clientId,
+                        DeviceID = devId,
+                        StartTime = start,
+                        EndTime = end,
+                        Status = "Pending",
+                        IsPaid = true,
+                        PrepaymentAmount = prepayment
+                    };
 
-                        LoadAvailableDevices();
+                    ctx.Reservations.Add(reservation);
+                    ctx.SaveChanges();
+
+                    ctx.Transactions.Add(new Transactions
+                    {
+                        ClientID = clientId,
+                        ReservationID = reservation.ReservationID,
+                        Amount = -prepayment,
+                        Type = "ResPrepay"                      // ← исправлено здесь
+                                                                // TransactionDate = DateTime.Now       // ← закомментируйте или удалите, если поля нет
+                    });
+
+                    device.Status = "Reserved";
+
+                    ctx.SaveChanges();
+
+                    CreateNotification(clientId,
+                        "Бронь создана",
+                        $"Устройство: {device.Name} ({device.Type})\n" +
+                        $"Время: {start:dd.MM.yyyy HH:mm} – {end:dd.MM.yyyy HH:mm}\n" +
+                        $"Списана предоплата: {prepayment:N2} ₽",
+                        "ReservationCreated");
+
+                    MessageBox.Show($"Бронь успешно создана!\n" +
+                                    $"Списана предоплата: {prepayment:N2} ₽\n", "Успех");
+
+                    _selectedDeviceId = null;
+                    LoadDevices();
+                }
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                var errorMsg = new System.Text.StringBuilder("Ошибка валидации:\n");
+                foreach (var eve in dbEx.EntityValidationErrors)
+                {
+                    errorMsg.AppendLine($"Объект типа {eve.Entry.Entity.GetType().Name} в состоянии {eve.Entry.State}:");
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        errorMsg.AppendLine($" → {ve.PropertyName}: {ve.ErrorMessage}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка бронирования:\n{ex.Message}", "Ошибка");
-                }
+                MessageBox.Show(errorMsg.ToString(), "Детали ошибки валидации", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при бронировании:\n{ex.Message}\n\n" +
+                                $"Inner: {ex.InnerException?.Message ?? "нет"}", "Ошибка");
             }
         }
 
@@ -181,11 +323,20 @@ namespace ComputerClub.Navigation
                     ctx.SaveChanges();
                 }
             }
-            catch { /* тихо игнорируем */ }
+            catch { /* игнорируем ошибки уведомлений */ }
         }
+
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadAvailableDevices();
+            LoadDevices();
+        }
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Выйти?", "Выход", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                AppConfig.Reset();
+                NavigationService?.Navigate(new Navigation.RoleSelectionPage());
+            }
         }
     }
 }

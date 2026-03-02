@@ -1,37 +1,112 @@
 ﻿<Page x:Class="ComputerClub.Navigation.BookingPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       Title="Бронирование места">
+
     <Grid Margin="30">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок и информация -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+        <!-- Заголовок -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
             <TextBlock Text="Бронирование компьютера / консоли"
-                       FontSize="28" FontWeight="Bold"
+                       FontSize="26" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentYellow}"
                        HorizontalAlignment="Center"/>
-
-            <TextBlock Text="Выберите свободное устройство и время брони"
-                       FontSize="16" Foreground="#AAAAAA"
+            <TextBlock Text="Выберите устройство и желаемое время"
+                       FontSize="15" Foreground="{StaticResource TextSecondary}"
                        HorizontalAlignment="Center" Margin="0,8,0,0"/>
         </StackPanel>
 
+        <!-- Панель выбора даты/времени -->
+        <Border Grid.Row="1" Background="{StaticResource BgInput}" CornerRadius="8"
+                BorderBrush="{StaticResource BorderInput}" BorderThickness="1"
+                Padding="20" Margin="0,0,0,24">
+            <StackPanel>
+                <TextBlock Text="Дата и время начала" FontSize="17" FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <!-- Дата -->
+                    <StackPanel Margin="0,0,48,0">
+                        <TextBlock Text="Дата" Style="{StaticResource FieldLabel}"/>
+                        <DatePicker x:Name="dpDate" Width="210" Height="44"
+                                    Style="{StaticResource DarkDatePicker}"
+                                    SelectedDate="{x:Static sys:DateTime.Today}"
+                                    DisplayDateStart="{x:Static sys:DateTime.Today}"/>
+                    </StackPanel>
+
+                    <!-- Время начала -->
+                    <StackPanel Margin="0,0,48,0">
+                        <TextBlock Text="Время начала" Style="{StaticResource FieldLabel}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="tbHour" Width="68" Style="{StaticResource DarkInput}"
+                                     MaxLength="2" TextAlignment="Center" FontSize="17"
+                                     Text="14"/>
+                            <TextBlock Text=":" FontSize="22" Foreground="{StaticResource TextPrimary}"
+                                       VerticalAlignment="Center" Margin="8,0"/>
+                            <TextBox x:Name="tbMinute" Width="68" Style="{StaticResource DarkInput}"
+                                     MaxLength="2" TextAlignment="Center" FontSize="17"
+                                     Text="00"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Длительность -->
+                    <StackPanel>
+                        <TextBlock Text="Длительность" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox x:Name="cbDuration" Width="170" Height="44"
+                                  Style="{StaticResource DarkComboBox}" SelectedIndex="1">
+                            <ComboBoxItem>1 час</ComboBoxItem>
+                            <ComboBoxItem>2 часа</ComboBoxItem>
+                            <ComboBoxItem>3 часа</ComboBoxItem>
+                            <ComboBoxItem>4 часа</ComboBoxItem>
+                            <ComboBoxItem>5 часов</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button x:Name="btnConfirm" Content="Забронировать"
+                        Style="{StaticResource YellowActionButton}"
+                        Width="240" Height="52" Margin="0,24,0,0"
+                        HorizontalAlignment="Center"
+                        Click="btnConfirm_Click" IsEnabled="False"/>
+            </StackPanel>
+        </Border>
+
         <!-- Список устройств -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <ItemsControl x:Name="icDevices">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="#1A1A2E"
-                                CornerRadius="12"
-                                Margin="0,0,0,16"
-                                Padding="20"
-                                BorderBrush="#333344"
-                                BorderThickness="1">
+                        <Border Background="{StaticResource BgInput}" CornerRadius="8"
+                                BorderThickness="1" Padding="18" Margin="0,0,0,14"
+                                MouseLeftButtonDown="DeviceCard_MouseDown">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="{StaticResource BorderInput}"/>
+                                    <Setter Property="Opacity" Value="1"/>
+                                    <Style.Triggers>
+                                        <!-- Выбрано -->
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="BorderBrush" Value="{StaticResource AccentYellow}"/>
+                                            <Setter Property="BorderThickness" Value="2"/>
+                                        </DataTrigger>
+                                        <!-- Не доступно -->
+                                        <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                            <Setter Property="Opacity" Value="0.55"/>
+                                            <Setter Property="BorderBrush" Value="#444455"/>
+                                            <Setter Property="Background" Value="#0F0F0F"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -40,39 +115,43 @@
 
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}"
-                                               FontSize="20" FontWeight="SemiBold"
-                                               Foreground="White"/>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                        <TextBlock Text="{Binding Type}"
-                                                   FontSize="14" Foreground="#AAAAAA"/>
-                                        <TextBlock Text=" • "
-                                                   FontSize="14" Foreground="#AAAAAA"
-                                                   Margin="8,0"/>
-                                        <TextBlock Text="{Binding Specs}"
-                                                   FontSize="14" Foreground="#AAAAAA"
+                                               FontSize="19" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <TextBlock Text="{Binding Type}" FontSize="14"
+                                                   Foreground="{StaticResource TextSecondary}"/>
+                                        <TextBlock Text=" • " FontSize="14" Foreground="{StaticResource TextSecondary}"
+                                                   Margin="6,0"/>
+                                        <TextBlock Text="{Binding Specs}" FontSize="14"
+                                                   Foreground="{StaticResource TextSecondary}"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
-
-                                    <TextBlock Text="{Binding TariffText}"
-                                               FontSize="15" FontWeight="Medium"
-                                               Foreground="{StaticResource AccentYellow}"
-                                               Margin="0,10,0,0"/>
-
-                                    <TextBlock Text="{Binding StatusDisplay}"
-                                               FontSize="13" Foreground="#FF6B6B"
-                                               Margin="0,6,0,0"
-                                               />
+                                    <TextBlock Text="{Binding TariffText}" FontSize="15" FontWeight="Medium"
+                                               Foreground="{StaticResource AccentYellow}" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding StatusDisplay}" FontSize="13" Margin="0,4,0,0"
+                                               Foreground="{Binding StatusColor}" FontWeight="Medium"/>
                                 </StackPanel>
 
-                                <Button Grid.Column="1"
-                                        Content="Забронировать"
-                                        Width="160" Height="50"
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource YellowActionButton}"
-                                        Tag="{Binding DeviceID}"
-                                        Click="BookDevice_Click"
-                                        IsEnabled="{Binding IsAvailable}"/>
+                                <!-- "ВЫБРАНО" только если выбрано И доступно -->
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentYellow}"
+                                           Text="ВЫБРАНО">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsSelected}" Value="True"/>
+                                                        <Condition Binding="{Binding IsAvailable}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -80,21 +159,23 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- Нижняя панель -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal"
-                    HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Button Content="Обновить список"
-                    Width="180" Height="50"
-                    Click="Refresh_Click"
-                    Style="{StaticResource YellowActionButton}"/>
-        </StackPanel>
-
-        <!-- Если список пуст -->
-        <TextBlock x:Name="tbNoDevices"
-                   Grid.Row="1"
-                   Text="В данный момент нет свободных устройств"
-                   FontSize="18" Foreground="#AAAAAA"
+        <TextBlock x:Name="tbNoDevices" Grid.Row="2"
+                   Text="Нет доступных устройств в данный момент"
+                   FontSize="17" Foreground="{StaticResource TextSecondary}"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    Visibility="Collapsed"/>
+
+        <!-- Нижняя панель -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center"
+            Margin="0,20,0,0">
+            <Button Content="Обновить список" Width="180" Height="48"
+            Style="{StaticResource YellowActionButton}"
+            Click="Refresh_Click"
+            Margin="0,0,16,0"/>
+
+            <Button Content="Выйти" Width="140" Height="48"
+            Style="{StaticResource FinishSessionButton}"
+            Click="Logout_Click"/>
+        </StackPanel>
     </Grid>
 </Page>
