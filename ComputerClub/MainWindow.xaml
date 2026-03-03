@@ -20,7 +20,6 @@
             <RowDefinition Height="48"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <Border x:Name="headerBorder" Grid.Row="0" Background="#111111" BorderThickness="0,0,0,1" BorderBrush="#222222">
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
@@ -45,26 +44,45 @@
             </Grid>
         </Border>
 
-        <!-- Контент -->
         <Frame x:Name="MainFrame"
                Grid.Row="1"
                NavigationUIVisibility="Hidden"
                Background="Transparent"/>
 
-        <!-- Footer -->
         <Border x:Name="footerBorder" Grid.Row="2" Background="#0D0D0D" BorderThickness="0,1,0,0" BorderBrush="#222222">
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+
                 <TextBlock Text="Powered by LAN GAME SOFTWARE v3.1.8.0"
-                           Foreground="#444444" FontSize="12"
-                           VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Русский ▼" Foreground="#AAAAAA" Margin="0,0,40,0"
-                               MouseLeftButtonDown="Language_MouseDown"/>
-                    <TextBlock x:Name="tbTime" Foreground="#AAAAAA" FontSize="13"/>
+                   Foreground="#444444" FontSize="15"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Left"/>
+
+                <TextBlock Grid.Column="1"
+                   Text="Правила посещения"
+                   Foreground="#AAAAAA"
+                   FontSize="15"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Style="{StaticResource LinkStyle}"
+                   MouseLeftButtonDown="RulesLink_MouseLeftButtonDown"
+                   Cursor="Hand"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock x:Name="tbTime" 
+                       Foreground="#AAAAAA" 
+                       FontSize="15" 
+                       Margin="0,0,16,0"/>  
+                    <TextBlock x:Name="tbKeyboardLayout"
+                       Text="RU"
+                       Foreground="#777777"  
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Border>

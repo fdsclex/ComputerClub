@@ -22,11 +22,10 @@
                     Click="Refresh_Click"/>
             <Button Content="Экспорт в CSV"
                     Margin="10,0,0,0" Padding="16,8"
-                    Style="{StaticResource FunButton}"
+                    Style="{StaticResource YellowActionButton}"
                     Click="ExportCsv_Click"/>
         </StackPanel>
 
-        <!-- Выбор периода -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" VerticalAlignment="Center">
             <TextBlock Text="Период:"
                        Style="{StaticResource FieldLabel}"
@@ -51,10 +50,8 @@
             <DatePicker x:Name="dpTo"   Width="160" Style="{StaticResource DarkDatePicker}" IsEnabled="False"/>
         </StackPanel>
 
-        <!-- Основной контент -->
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <!-- Выручка -->
                 <Border Background="#1E1E2E" CornerRadius="8" Padding="20" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Выручка за период"
@@ -68,7 +65,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- График -->
                 <Border Background="#1E1E2E" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Выручка по дням"
@@ -86,7 +82,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Топ-5 товаров -->
                 <Border Background="#1E1E2E" CornerRadius="8" Padding="16" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Топ-5 товаров"
@@ -107,7 +102,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Топ-5 клиентов -->
                 <Border Background="#1E1E2E" CornerRadius="8" Padding="16">
                     <StackPanel>
                         <TextBlock Text="Топ-5 клиентов"

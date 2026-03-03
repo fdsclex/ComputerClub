@@ -328,7 +328,6 @@ namespace ComputerClub.ClientPanel
             }
             catch (Exception ex)
             {
-                // Можно логировать, но не показывать пользователю
                 Console.WriteLine($"Ошибка создания уведомления: {ex.Message}");
             }
         }
@@ -348,9 +347,8 @@ namespace ComputerClub.ClientPanel
                     var client = ctx.Clients.Find(AppConfig.CurrentClientId.Value);
                     if (client == null) throw new Exception("Клиент не найден");
 
-                    // Безопасно берём значения (но TotalAmount уже не nullable)
-                    decimal orderAmount = order.TotalAmount; // ← убрали ??, т.к. поле NOT NULL
-                    decimal clientBalance = client.Balance ?? 0m; // ← Balance может быть null, оставляем ??
+                    decimal orderAmount = order.TotalAmount; 
+                    decimal clientBalance = client.Balance ?? 0m;
 
                     if (clientBalance < orderAmount)
                     {
@@ -361,10 +359,8 @@ namespace ComputerClub.ClientPanel
                                             $"Не хватает: {shortage:N0} ₽");
                     }
 
-                    // Списываем деньги
                     client.Balance = clientBalance - orderAmount;
 
-                    // Создаём транзакцию
                     ctx.Transactions.Add(new Transactions
                     {
                         ClientID = client.ClientID,
@@ -374,7 +370,6 @@ namespace ComputerClub.ClientPanel
                         TransactionDate = DateTime.Now
                     });
 
-                    // Меняем статус
                     order.Status = "Processing";
                     ctx.SaveChanges();
                     CreateNotification(client.ClientID,

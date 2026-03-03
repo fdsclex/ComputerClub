@@ -56,58 +56,9 @@ namespace ComputerClub.Navigation
 
             using (var ctx = new Entities())
             {
-                // 1. Проверяем активную сессию на этом устройстве (только если режим "на месте")
-                if (currentDeviceId.HasValue)
-                {
-                    var activeSession = ctx.Sessions
-                        .FirstOrDefault(s => s.DeviceID == currentDeviceId.Value &&
-                                             s.EndTime == null &&
-                                             s.Status == "Active");
-
-                    if (activeSession != null)
-                    {
-                        // Есть активная сессия — проверяем, наш ли это клиент
-                        var clientTemp = ctx.Clients.FirstOrDefault(c => c.Phone == phone);
-
-                        if (clientTemp == null || clientTemp.ClientID != activeSession.ClientID)
-                        {
-                            MessageBox.Show(
-                                $"Устройство №{currentDeviceId} уже занято другим пользователем.\n" +
-                                "Сейчас на нём идёт активная сессия.\n\n" +
-                                "Выберите другое свободное устройство или дождитесь завершения сессии.",
-                                "Устройство занято",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Stop
-                            );
-                            return;
-                        }
-                        // Если это наш клиент → пускаем, продолжаем сессию
-                    }
-                }
-
-                // 2. Проверка логина
                 var client = ctx.Clients.FirstOrDefault(c => c.Phone == phone);
 
-                if (client != null && PasswordHelper.VerifyPassword(password, client.Password))
-                {
-                    AppConfig.CurrentClientId = client.ClientID;
-                    failedAttemptsCount = 0;
-                    captchaPanel.Visibility = Visibility.Collapsed;
-                    loginPanel.Visibility = Visibility.Visible;
-                    ((MainWindow)Application.Current.MainWindow).ExitCaptchaMode();
-
-                    // Решаем, куда перейти после логина
-                    if (AppConfig.NavigateToBookingAfterLogin)
-                    {
-                        AppConfig.NavigateToBookingAfterLogin = false;
-                        NavigationService.Navigate(new BookingPage());
-                    }
-                    else
-                    {
-                        NavigationService.Navigate(new ComputerClub.ClientPanel.ClientShellPage());
-                    }
-                }
-                else
+                if (client == null || !PasswordHelper.VerifyPassword(password, client.Password))
                 {
                     failedAttemptsCount++;
                     if (failedAttemptsCount >= 3)
@@ -123,12 +74,75 @@ namespace ComputerClub.Navigation
                         int remaining = 3 - failedAttemptsCount;
                         MessageBox.Show($"Неверный телефон или пароль. Осталось попыток: {remaining}");
                     }
+                    return;
+                }
+
+                // Если мы в режиме "на месте" и устройство выбрано
+                if (currentDeviceId.HasValue)
+                {
+                    var device = ctx.Devices.FirstOrDefault(d => d.DeviceID == currentDeviceId.Value);
+
+                    if (device == null)
+                    {
+                        MessageBox.Show("Выбранное устройство не найдено в системе.", "Ошибка");
+                        return;
+                    }
+
+                    // Разрешён вход только на Reserved или InUse (Available уже пропущен на предыдущей странице)
+                    if (device.Status != "Reserved" && device.Status != "InUse" && device.Status != "Available")
+                    {
+                        MessageBox.Show(
+                            $"Устройство №{currentDeviceId} сейчас не готово к использованию.\n" +
+                            $"Текущий статус: {device.Status ?? "не указан"}",
+                            "Устройство недоступно для входа",
+                            MessageBoxButton.OK, MessageBoxImage.Stop
+                        );
+                        return;
+                    }
+
+                    // Проверяем, принадлежит ли устройство этому клиенту (если Reserved/InUse)
+                    bool isMyDevice = ctx.Sessions.Any(s =>
+                        s.ClientID == client.ClientID &&
+                        s.DeviceID == currentDeviceId.Value &&
+                        s.EndTime == null &&
+                        s.Status == "Active"
+                    ) || ctx.Reservations.Any(r =>
+                        r.ClientID == client.ClientID &&
+                        r.DeviceID == currentDeviceId.Value &&
+                        (r.Status == "Active" || r.Status == "Pending")
+                    );
+
+                    if (!isMyDevice)
+                    {
+                        MessageBox.Show(
+                            $"Устройство №{currentDeviceId} занято другим пользователем.\n" +
+                            "Вы не можете войти на чужое устройство.\n\n" +
+                            "Пожалуйста, выберите своё устройство или дождитесь освобождения.",
+                            "Чужое устройство",
+                            MessageBoxButton.OK, MessageBoxImage.Stop
+                        );
+                        return;
+                    }
+                }
+
+                // Успешный вход
+                AppConfig.CurrentClientId = client.ClientID;
+                failedAttemptsCount = 0;
+                captchaPanel.Visibility = Visibility.Collapsed;
+                loginPanel.Visibility = Visibility.Visible;
+                ((MainWindow)Application.Current.MainWindow).ExitCaptchaMode();
+
+                if (AppConfig.NavigateToBookingAfterLogin)
+                {
+                    AppConfig.NavigateToBookingAfterLogin = false;
+                    NavigationService.Navigate(new BookingPage());
+                }
+                else
+                {
+                    NavigationService.Navigate(new ComputerClub.ClientPanel.ClientShellPage());
                 }
             }
         }
-
-        // ------------------ Восстановление пароля ------------------
-
         private void ForgotPassword_Click(object sender, MouseButtonEventArgs e)
         {
             loginPanel.Visibility = Visibility.Collapsed;
@@ -237,9 +251,6 @@ namespace ComputerClub.Navigation
                 MessageBox.Show($"Ошибка изменения пароля:\n{ex.Message}", "Ошибка");
             }
         }
-
-        // ------------------ Капча (без изменений) ------------------
-
         private void GenerateCaptcha()
         {
             captchaCanvas.Children.Clear();

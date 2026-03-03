@@ -247,7 +247,6 @@ namespace ComputerClub.ClientPanel
                         _activeSessionId = newSession.SessionID;
                         AppConfig.IsSessionActive = true;
 
-                        // Можно создать уведомление о начале (опционально)
                         CreateSessionStartedNotification(ctx, AppConfig.CurrentClientId.Value);
 
                         MessageBox.Show("Сессия начата. Приятной игры!", "Успех");
@@ -262,7 +261,6 @@ namespace ComputerClub.ClientPanel
             }
         }
 
-        // Уведомление о завершении сессии
         private void CreateSessionCompletedNotification(Entities ctx, int clientId, int deviceNumber)
         {
             try

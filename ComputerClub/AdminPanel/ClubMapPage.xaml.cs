@@ -71,12 +71,10 @@ namespace ComputerClub.AdminPanel
                                     var frozenFor = DateTime.Now - session.FreezeStartTime.Value;
                                     duration = $"Заморожено {frozenFor:mm\\:ss}";
 
-                                    // Проверяем, не истекло ли время заморозки
                                     int maxMin = session.MaxFreezeMinutes ?? 60;
                                     if (frozenFor.TotalMinutes > maxMin)
                                     {
                                         duration += " (истекло время)";
-                                        // Можно здесь автоматически разморозить или завершить — по желанию
                                     }
                                 }
                             }

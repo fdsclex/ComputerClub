@@ -138,7 +138,7 @@ namespace ComputerClub.AdminPanel
                         .Where(t => t.TransactionDate >= start
                                  && t.TransactionDate < end
                                  && t.Amount < 0
-                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder" || t.Type == "SessionWithdrawal"))
                         .Sum(t => (decimal?)-t.Amount) ?? 0m;
 
                     tbRevenue.Text = totalRevenue.ToString("N0") + " ₽";
@@ -150,7 +150,7 @@ namespace ComputerClub.AdminPanel
                         .Where(t => t.TransactionDate >= start
                                  && t.TransactionDate < end
                                  && t.Amount < 0
-                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder" || t.Type == "SessionWithdrawal"))
                         .GroupBy(t => DbFunctions.TruncateTime(t.TransactionDate))
                         .Select(g => new
                         {
@@ -176,7 +176,7 @@ namespace ComputerClub.AdminPanel
                     // ─────────────────────────────────────────────────────────────
                     var topItems = ctx.OrderItems
                         .Join(ctx.Orders, oi => oi.OrderID, o => o.OrderID, (oi, o) => new { oi, o })
-                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && x.o.Status == "Completed")
+                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && (x.o.Status == "Delivered" || x.o.Status == "Completed"))
                         .GroupBy(x => x.oi.MenuItemID)
                         .Select(g => new
                         {
@@ -203,7 +203,7 @@ namespace ComputerClub.AdminPanel
                         .Where(t => t.TransactionDate >= start
                                  && t.TransactionDate < end
                                  && t.Amount < 0
-                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder" || t.Type == "SessionWithdrawal"))
                         .GroupBy(t => t.ClientID)
                         .Select(g => new
                         {
@@ -417,13 +417,13 @@ namespace ComputerClub.AdminPanel
                     decimal totalRevenue = ctx.Transactions
                         .Where(t => t.TransactionDate >= start && t.TransactionDate < end
                                  && t.Amount < 0
-                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder" || t.Type == "SessionWithdrawal"))
                         .Sum(t => (decimal?)-t.Amount) ?? 0m;
 
                     // Топ-5 товаров
                     var topItems = ctx.OrderItems
                         .Join(ctx.Orders, oi => oi.OrderID, o => o.OrderID, (oi, o) => new { oi, o })
-                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && x.o.Status == "Completed")
+                        .Where(x => x.o.OrderDate >= start && x.o.OrderDate < end && (x.o.Status == "Delivered" || x.o.Status == "Completed"))
                         .GroupBy(x => x.oi.MenuItemID)
                         .Select(g => new
                         {
@@ -445,7 +445,7 @@ namespace ComputerClub.AdminPanel
                     var topClients = ctx.Transactions
                         .Where(t => t.TransactionDate >= start && t.TransactionDate < end
                                  && t.Amount < 0
-                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder"))
+                                 && (t.Type == "Withdrawal" || t.Type == "FoodOrder" || t.Type == "SessionWithdrawal"))
                         .GroupBy(t => t.ClientID)
                         .Select(g => new
                         {

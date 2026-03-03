@@ -23,6 +23,7 @@ namespace ComputerClub.Navigation
             using (var ctx = new Entities())
             {
                 var device = ctx.Devices.FirstOrDefault(d => d.DeviceID == deviceId);
+
                 if (device == null)
                 {
                     MessageBox.Show($"Устройство №{deviceId} не найдено в системе.",
@@ -30,39 +31,54 @@ namespace ComputerClub.Navigation
                     return;
                 }
 
-                if (device.Status != "Available")
+                // Разрешены только эти три статуса
+                if (device.Status != "Available" &&
+                    device.Status != "Reserved" &&
+                    device.Status != "InUse")
                 {
-                    string statusDisplay = string.IsNullOrWhiteSpace(device.Status) ? "не указан" : device.Status;
+                    string statusText;
+
+                    if (device.Status == "Maintenance")
+                    {
+                        statusText = "находится в техническом обслуживании";
+                    }
+                    else if (device.Status == "Offline")
+                    {
+                        statusText = "отключено или не работает";
+                    }
+                    else
+                    {
+                        statusText = $"имеет статус '{device.Status ?? "не указан"}'";
+                    }
+
                     MessageBox.Show(
                         $"Устройство №{deviceId} ({device.Name ?? device.Type ?? "без названия"}) " +
                         $"в настоящее время недоступно.\n\n" +
-                        $"Текущий статус: **{statusDisplay}**\n\n" +
-                        "Пожалуйста, выберите другое свободное устройство.",
-                        "Устройство занято / недоступно",
+                        $"Причина: устройство {statusText}.\n\n" +
+                        "Вход возможен только на свободные, зарезервированные или занятые устройства.",
+                        "Устройство недоступно",
                         MessageBoxButton.OK, MessageBoxImage.Warning
                     );
+
                     tbDeviceNumber.Focus();
                     tbDeviceNumber.SelectAll();
                     return;
                 }
 
-                // Устройство выбрано и доступно → сохраняем
+                // Устройство выбрано и разрешено → сохраняем
                 AppConfig.IsOnSite = true;
                 AppConfig.DeviceNumber = deviceId;
                 AppConfig.DeviceName = device.Name ?? device.Type ?? "Устройство";
                 AppConfig.DeviceType = device.Type;
                 AppConfig.TariffID = device.TariffID;
 
-                // Решаем, куда переходить
                 if (AppConfig.IsDeviceSwitchInProgress)
                 {
-                    // Это была пересадка → возвращаемся в кабинет
-                    AppConfig.IsDeviceSwitchInProgress = false; // сбрасываем флаг
+                    AppConfig.IsDeviceSwitchInProgress = false;
                     NavigationService?.Navigate(new ClientPanel.ClientCabinetPage());
                 }
                 else
                 {
-                    // Обычный вход → идём на страницу логина
                     NavigationService?.Navigate(new ClientLoginPage());
                 }
             }

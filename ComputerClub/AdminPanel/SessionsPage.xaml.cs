@@ -298,6 +298,9 @@ namespace ComputerClub.AdminPanel
 
                     ctx.SaveChanges();
 
+                    // Создаём уведомление администратору (аналогично клиентскому)
+                    CreateAdminNotification(ctx, reservation.ClientID, sel.DeviceName, "SessionActivatedByAdmin");
+
                     MessageBox.Show("Сессия успешно начата!", "Успех");
                     LoadData();
                 }
@@ -305,6 +308,31 @@ namespace ComputerClub.AdminPanel
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при активации:\n{ex.Message}", "Ошибка");
+            }
+        }
+
+        // Новый метод для уведомления администратору (можно вызвать и в других местах)
+        private void CreateAdminNotification(Entities ctx, int clientId, string deviceName, string type)
+        {
+            try
+            {
+                string message = $"Администратор начал сессию для клиента на устройстве {deviceName}.";
+
+                ctx.Notifications.Add(new Notifications
+                {
+                    ClientID = clientId,  // или null, если уведомление только админу
+                    Title = "Сессия активирована администратором",
+                    Message = message,
+                    Type = type,
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                });
+
+                ctx.SaveChanges();
+            }
+            catch
+            {
+                // Тихо игнорируем, чтобы не ломать основной процесс
             }
         }
         private void FixStuckReservedDevices()

@@ -90,7 +90,7 @@ namespace ComputerClub.Navigation
                                 s.DeviceID == d.DeviceID &&
                                 s.EndTime == null &&
                                 s.Status == "Active"),
-                            Status = d.Status   // ← добавили это поле
+                            Status = d.Status
                         })
                         .OrderBy(d => d.Name)
                         .ToList();
@@ -263,8 +263,8 @@ namespace ComputerClub.Navigation
                         ClientID = clientId,
                         ReservationID = reservation.ReservationID,
                         Amount = -prepayment,
-                        Type = "ResPrepay"                      // ← исправлено здесь
-                                                                // TransactionDate = DateTime.Now       // ← закомментируйте или удалите, если поля нет
+                        Type = "ResPrepay",                      // ← исправлено здесь
+                        TransactionDate = DateTime.Now       // ← закомментируйте или удалите, если поля нет
                     });
 
                     device.Status = "Reserved";
