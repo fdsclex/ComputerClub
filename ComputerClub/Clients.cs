@@ -17,11 +17,13 @@ namespace ComputerClub
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Clients()
         {
+            this.ChatReadStatus = new HashSet<ChatReadStatus>();
             this.Notifications = new HashSet<Notifications>();
             this.Orders = new HashSet<Orders>();
             this.Reservations = new HashSet<Reservations>();
             this.Sessions = new HashSet<Sessions>();
             this.Transactions = new HashSet<Transactions>();
+            this.SupportMessages = new HashSet<SupportMessages>();
         }
     
         public int ClientID { get; set; }
@@ -34,6 +36,8 @@ namespace ComputerClub
         public Nullable<System.DateTime> RegistrationDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChatReadStatus> ChatReadStatus { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Notifications> Notifications { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Orders> Orders { get; set; }
@@ -43,5 +47,7 @@ namespace ComputerClub
         public virtual ICollection<Sessions> Sessions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Transactions> Transactions { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SupportMessages> SupportMessages { get; set; }
     }
 }

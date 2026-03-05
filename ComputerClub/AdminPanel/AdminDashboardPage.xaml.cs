@@ -49,6 +49,9 @@ namespace ComputerClub.AdminPanel
                     case "ReportsPage":
                         MainFrame.Navigate(new ReportsPage());
                         break;
+                    case "SupportChatsPage":
+                        MainFrame.Navigate(new SupportChatsPage());
+                        break;
                     default:
                         MessageBox.Show("Страница в разработке");
                         break;

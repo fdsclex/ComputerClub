@@ -17,9 +17,11 @@ namespace ComputerClub
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Employees()
         {
+            this.ChatReadStatus = new HashSet<ChatReadStatus>();
             this.Orders = new HashSet<Orders>();
             this.Sessions = new HashSet<Sessions>();
             this.Transactions = new HashSet<Transactions>();
+            this.SupportMessages = new HashSet<SupportMessages>();
         }
     
         public int EmployeeID { get; set; }
@@ -30,10 +32,14 @@ namespace ComputerClub
         public Nullable<System.DateTime> HireDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChatReadStatus> ChatReadStatus { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Orders> Orders { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Sessions> Sessions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Transactions> Transactions { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SupportMessages> SupportMessages { get; set; }
     }
 }

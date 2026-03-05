@@ -1,0 +1,155 @@
+﻿<Page x:Class="ComputerClub.AdminPanel.SupportChatsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Чаты с клиентами">
+
+    <Grid Background="#0F0F1A">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="330"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель -->
+        <Border Background="#1A1A2E" CornerRadius="0,12,12,0" Margin="0,0,16,0">
+            <StackPanel Margin="16">
+                <TextBlock Text="Активные чаты" FontSize="20" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,16"/>
+                <ListBox x:Name="lbClients" Background="Transparent" BorderThickness="0"
+         SelectionChanged="lbClients_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                           Text="{Binding FullName}"
+                           FontSize="16"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+
+                                <Border Grid.Column="1"
+                        Background="#E53935"
+                        CornerRadius="10"
+                        MinWidth="20" MinHeight="20"
+                        Padding="6,2"
+                        Margin="12,0,8,0"
+                        Visibility="{Binding BadgeVisibility}"
+                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding UnreadCount}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="White"
+                               TextAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <!-- Правая панель -->
+        <Border Grid.Column="1" Background="#1A1A2E" CornerRadius="12">
+            <Grid>
+                <TextBlock Text="Выберите клиента слева" FontSize="18" Foreground="#AAAAAA" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center" 
+                           x:Name="tbPlaceholder"/>
+
+                <Grid x:Name="ChatGrid" Margin="16" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock x:Name="tbChatHeader" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                        <Button Content="Очистить чат" Style="{StaticResource FinishSessionButton}" Width="140" Height="36" Margin="20,0,0,0" Click="ClearChat_Click"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Background="#0F0F1A" CornerRadius="8" ClipToBounds="True">
+                        <ScrollViewer x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="12">
+                            <ItemsControl x:Name="MessagesItemsControl" ItemsSource="{Binding Messages, RelativeSource={RelativeSource AncestorType=Page}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <!-- Сообщение -->
+                                            <Border Margin="0,4,0,2" Padding="10,8" CornerRadius="12" MaxWidth="380">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EmployeeID}" Value="{x:Null}">
+                                                                <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                                <Setter Property="Background" Value="#282850"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding EmployeeID}" Value="4">
+                                                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                                <Setter Property="Background" Value="#305030"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding Content}" Foreground="White" TextWrapping="Wrap" FontSize="14"/>
+                                            </Border>
+
+                                            <!-- Время + галочки (только у исходящих) -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="StackPanel">
+                                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EmployeeID}" Value="4">
+                                                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+
+                                                <TextBlock Text="{Binding SentAt, StringFormat='HH:mm', ConverterCulture=ru-RU}" 
+                                                        FontSize="11" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+
+                                                <!-- Галочки только для сообщений админа -->
+                                                <TextBlock FontSize="11" Text="✓✓" Foreground="#AAAAAA" Visibility="Collapsed">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EmployeeID}" Value="4">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsReadByClient}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#4CAF50"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Grid Grid.Row="2" Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="tbMessageInput" Style="{StaticResource DarkInput}" AcceptsReturn="True" 
+                                 Height="80" VerticalScrollBarVisibility="Auto" KeyDown="tbMessageInput_KeyDown"/>
+                        <Button Grid.Column="1" Content="Отправить" Style="{StaticResource YellowActionButton}" 
+                                Width="120" Height="48" Margin="12,0,0,0" Click="SendMessage_Click"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

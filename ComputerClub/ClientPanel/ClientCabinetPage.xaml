@@ -8,7 +8,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="140"/>
         </Grid.RowDefinitions>
-        <!-- Верхняя панель -->
+
+        <!-- Верхняя панель с кнопками -->
         <Border Background="#1A1A2E" Grid.Row="0">
             <Grid Margin="20,0">
                 <Grid.ColumnDefinitions>
@@ -16,95 +17,167 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="tbWelcome"
-                               FontSize="20" FontWeight="SemiBold"
-                               Foreground="White"/>
+                    <TextBlock x:Name="tbWelcome" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                         <TextBlock Text="Баланс:" FontSize="16" Foreground="#AAAAAA"/>
-                        <TextBlock x:Name="tbBalance"
-                                   FontSize="18" FontWeight="Bold"
-                                   Foreground="{StaticResource AccentYellow}" Margin="8,0,0,0"/>
-                        <TextBlock x:Name="tbStatus"
-                                   FontSize="16" Foreground="#AAAAAA"
-                                   Margin="24,0,0,0"/>
+                        <TextBlock x:Name="tbBalance" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentYellow}" Margin="8,0,0,0"/>
+                        <TextBlock x:Name="tbStatus" FontSize="16" Foreground="#AAAAAA" Margin="24,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button x:Name="btnChatTab" Content="Чат с админом"
-                            Style="{StaticResource YellowActionButton}"
-                            Width="180" Height="48" Margin="0,0,12,0"
-                            Click="SwitchChatTariff_Click" Tag="Chat"/>
-                    <Button x:Name="btnTariffTab" Content="Тарифы"
-                            Style="{StaticResource YellowActionButton}"
-                            Width="180" Height="48"
-                            Click="SwitchChatTariff_Click" Tag="Tariff"/>
+                    <Button x:Name="btnChatTab" Content="Чат с админом" Style="{StaticResource YellowActionButton}" 
+        Width="180" Height="48" Margin="0,0,12,0" 
+        Click="SwitchChatTariff_Click" Tag="Chat"/>
+                    <Border x:Name="UnreadBadge" Background="#FF3B30" CornerRadius="10" 
+            Width="20" Height="20" Visibility="Collapsed"
+            VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-8,-8,0">
+                        <TextBlock x:Name="UnreadBadgeText" Text="!" Foreground="White" FontSize="12" 
+                   FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Button x:Name="btnTariffTab" Content="Тарифы" Style="{StaticResource YellowActionButton}" Width="180" Height="48" Click="SwitchChatTariff_Click" Tag="Tariff"/>
                 </StackPanel>
             </Grid>
         </Border>
+
         <!-- Основной контент -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="280"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="350"/>
             </Grid.ColumnDefinitions>
+
             <!-- Левое меню -->
             <Border Background="#1A1A2E" CornerRadius="0,12,12,0" Margin="0,0,16,0">
                 <StackPanel Margin="16">
-                    <RadioButton x:Name="rbShop" Content="Магазин"
-                                 Style="{StaticResource NavRadioButton}"
-                                 IsChecked="True"
-                                 Click="Tab_Click" Tag="Shop"/>
-                    <RadioButton x:Name="rbNotifications" Content="Уведомления"
-                                 Style="{StaticResource NavRadioButton}"
-                                 Click="Tab_Click" Tag="Notifications"/>
-                    <RadioButton x:Name="rbLoyalty" Content="Программа лояльности"
-                                 Style="{StaticResource NavRadioButton}"
-                                 Click="Tab_Click" Tag="Loyalty"/>
-                    <RadioButton x:Name="rbProfile" Content="Профиль"
-                                 Style="{StaticResource NavRadioButton}"
-                                 Click="Tab_Click" Tag="Profile"/>
+                    <RadioButton x:Name="rbShop" Content="Магазин" Style="{StaticResource NavRadioButton}" IsChecked="True" Click="Tab_Click" Tag="Shop"/>
+                    <RadioButton x:Name="rbNotifications" Content="Уведомления" Style="{StaticResource NavRadioButton}" Click="Tab_Click" Tag="Notifications"/>
+                    <RadioButton x:Name="rbLoyalty" Content="Программа лояльности" Style="{StaticResource NavRadioButton}" Click="Tab_Click" Tag="Loyalty"/>
+                    <RadioButton x:Name="rbProfile" Content="Профиль" Style="{StaticResource NavRadioButton}" Click="Tab_Click" Tag="Profile"/>
                 </StackPanel>
             </Border>
-            <!-- Центр: вкладка + скролл вокруг Frame -->
-            <ScrollViewer Grid.Column="1"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Background="Transparent"
-                          Padding="0,0,8,0">
-                <Frame x:Name="CabinetFrame"
-                       NavigationUIVisibility="Hidden"
-                       Background="Transparent"/>
+
+            <!-- Центр: вкладки -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="Transparent" Padding="0,0,8,0">
+                <Frame x:Name="CabinetFrame" NavigationUIVisibility="Hidden" Background="Transparent"/>
             </ScrollViewer>
-            <!-- Правая панель: Чат / Тарифы -->
+
+            <!-- Правая панель: Чат / Тарифы (переключается кнопками сверху) -->
             <Grid Grid.Column="2" Margin="16,0,0,0">
                 <!-- Чат -->
-                <Border x:Name="ChatPanel" Background="#1A1A2E" CornerRadius="12" Visibility="Visible">
-                    <StackPanel Margin="16">
-                        <TextBlock Text="Чат с администратором" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,12"/>
-                        <Border Background="#0F0F1A" CornerRadius="8" Height="400">
-                            <TextBlock Text="Здесь будут сообщения от админа и клиента"
-                                       Foreground="#AAAAAA" TextWrapping="Wrap" Margin="16"/>
+                <Border x:Name="ChatPanel" Background="#1A1A2E" CornerRadius="12" Visibility="Collapsed">
+                    <Grid Margin="16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Чат с администратором" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,12"/>
+
+                        <Border Grid.Row="1" Background="#0F0F1A" CornerRadius="8" ClipToBounds="True">
+                            <ScrollViewer x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="12">
+                                <ItemsControl x:Name="MessagesItemsControl" ItemsSource="{Binding Messages, RelativeSource={RelativeSource AncestorType=Page}}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <!-- Пузырьки (исправлено выравнивание для клиента) -->
+                                                <Border Margin="0,4,0,2" Padding="10,8" CornerRadius="12" MaxWidth="320">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EmployeeID}" Value="{x:Null}">
+                                                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                                    <Setter Property="Background" Value="#305030"/>
+                                                                    <!-- мой сообщение - зелёный -->
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding EmployeeID}" Value="4">
+                                                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                                    <Setter Property="Background" Value="#282850"/>
+                                                                    <!-- от админа - синий -->
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Content}" Foreground="White" TextWrapping="Wrap" FontSize="14"/>
+                                                </Border>
+
+                                                <!-- Время + галочки (только у исходящих) -->
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="StackPanel">
+                                                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding EmployeeID}" Value="{x:Null}">
+                                                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+
+                                                    <TextBlock Text="{Binding SentAt, StringFormat='HH:mm', ConverterCulture=ru-RU}" 
+                                                        FontSize="11" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+
+                                                    <!-- Галочки только для сообщений клиента -->
+                                                    <TextBlock FontSize="11" Text="✓✓" Foreground="#AAAAAA" Visibility="Collapsed">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding EmployeeID}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsReadByEmployee}" Value="True">
+                                                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
                         </Border>
-                        <TextBox Style="{StaticResource DarkInput}" Height="80" Margin="0,12,0,0" AcceptsReturn="True"/>
-                        <Button Content="Отправить" Style="{StaticResource YellowActionButton}" Margin="0,12,0,0"/>
-                    </StackPanel>
+
+                        <Grid Grid.Row="2" Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="tbMessageInput" Style="{StaticResource DarkInput}" AcceptsReturn="True" Width="90" Height="50" VerticalScrollBarVisibility="Auto" KeyDown="tbMessageInput_KeyDown"/>
+                            <Button Grid.Column="1" Content="Отправить" Style="{StaticResource YellowActionButton}" Width="100" Height="50" Margin="12,0,0,12" Click="SendMessage_Click"/>
+                        </Grid>
+                    </Grid>
                 </Border>
-                <!-- Тарифы -->
+
+                <!-- Тарифы (динамичные, всегда видны при переключении) -->
                 <Border x:Name="TariffPanel" Background="#1A1A2E" CornerRadius="12" Visibility="Collapsed">
                     <StackPanel Margin="16">
-                        <TextBlock Text="Ваши тарифы" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,16"/>
-                        <Border Background="#0F0F1A" CornerRadius="8" Padding="16">
+                        <TextBlock Text="Текущий тариф устройства" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,16"/>
+
+                        <Border x:Name="TariffInfoPanel" Background="#0F0F1A" CornerRadius="8" Padding="16" Visibility="Collapsed">
                             <StackPanel>
-                                <TextBlock Text="Текущий тариф: Стандарт" FontSize="16" Foreground="{StaticResource AccentYellow}"/>
-                                <TextBlock Text="Скорость: 1 Гбит/с" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
-                                <TextBlock Text="Цена: 100 ₽/час" FontSize="14" Foreground="#AAAAAA"/>
+                                <TextBlock x:Name="tbTariffName" FontSize="16" Foreground="{StaticResource AccentYellow}" Text="Загрузка..."/>
+                                <TextBlock x:Name="tbTariffDescription" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="tbTariffPrice" FontSize="14" Foreground="#AAAAAA" Margin="0,8,0,0"/>
                             </StackPanel>
                         </Border>
+
+                        <TextBlock x:Name="tbNoTariff" FontSize="16" Foreground="#AAAAAA" TextAlignment="Center" Margin="0,20,0,0">
+                            Выберите устройство, чтобы увидеть тариф
+                        </TextBlock>
                     </StackPanel>
                 </Border>
             </Grid>
         </Grid>
+
         <!-- Нижняя панель -->
         <Border Background="#1A1A2E" Grid.Row="2">
             <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">

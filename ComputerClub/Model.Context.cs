@@ -25,6 +25,7 @@ namespace ComputerClub
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<ChatReadStatus> ChatReadStatus { get; set; }
         public virtual DbSet<Clients> Clients { get; set; }
         public virtual DbSet<DeviceGames> DeviceGames { get; set; }
         public virtual DbSet<Devices> Devices { get; set; }
@@ -36,6 +37,7 @@ namespace ComputerClub
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Reservations> Reservations { get; set; }
         public virtual DbSet<Sessions> Sessions { get; set; }
+        public virtual DbSet<SupportMessages> SupportMessages { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Tariffs> Tariffs { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }

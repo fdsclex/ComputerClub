@@ -5,6 +5,15 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="Хранилище ComputerClubDBModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ChatReadStatus">
+          <Key>
+            <PropertyRef Name="ClientID" />
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="ClientID" Type="int" Nullable="false" />
+          <Property Name="EmployeeID" Type="int" Nullable="false" />
+          <Property Name="LastReadTime" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="Clients">
           <Key>
             <PropertyRef Name="ClientID" />
@@ -130,6 +139,18 @@
           <Property Name="IsFrozen" Type="bit" Nullable="false" />
           <Property Name="FreezeStartTime" Type="datetime" />
           <Property Name="MaxFreezeMinutes" Type="int" />
+        </EntityType>
+        <EntityType Name="SupportMessages">
+          <Key>
+            <PropertyRef Name="MessageID" />
+          </Key>
+          <Property Name="MessageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientID" Type="int" />
+          <Property Name="EmployeeID" Type="int" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="SentAt" Type="datetime" Nullable="false" />
+          <Property Name="IsReadByClient" Type="bit" Nullable="false" />
+          <Property Name="IsReadByEmployee" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -386,6 +407,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ChatReadStatus_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="ChatReadStatus" Type="Self.ChatReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="ChatReadStatus">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChatReadStatus_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="ChatReadStatus" Type="Self.ChatReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="ChatReadStatus">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Devices_Tariffs">
           <End Role="Tariffs" Type="Self.Tariffs" Multiplicity="1" />
           <End Role="Devices" Type="Self.Devices" Multiplicity="*" />
@@ -398,7 +443,32 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SupportMessages_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="0..1" />
+          <End Role="SupportMessages" Type="Self.SupportMessages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="SupportMessages">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SupportMessages_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="SupportMessages" Type="Self.SupportMessages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="SupportMessages">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="Хранилище ComputerClubDBModelContainer">
+          <EntitySet Name="ChatReadStatus" EntityType="Self.ChatReadStatus" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Clients" EntityType="Self.Clients" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DeviceGames" EntityType="Self.DeviceGames" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Devices" EntityType="Self.Devices" Schema="dbo" store:Type="Tables" />
@@ -410,6 +480,7 @@
           <EntitySet Name="Orders" EntityType="Self.Orders" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reservations" EntityType="Self.Reservations" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sessions" EntityType="Self.Sessions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SupportMessages" EntityType="Self.SupportMessages" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tariffs" EntityType="Self.Tariffs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Transactions" EntityType="Self.Transactions" Schema="dbo" store:Type="Tables" />
@@ -485,9 +556,25 @@
             <End Role="Sessions" EntitySet="Sessions" />
             <End Role="Transactions" EntitySet="Transactions" />
           </AssociationSet>
+          <AssociationSet Name="FK_ChatReadStatus_Clients" Association="Self.FK_ChatReadStatus_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="ChatReadStatus" EntitySet="ChatReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChatReadStatus_Employees" Association="Self.FK_ChatReadStatus_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="ChatReadStatus" EntitySet="ChatReadStatus" />
+          </AssociationSet>
           <AssociationSet Name="FK_Devices_Tariffs" Association="Self.FK_Devices_Tariffs">
             <End Role="Tariffs" EntitySet="Tariffs" />
             <End Role="Devices" EntitySet="Devices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SupportMessages_Clients" Association="Self.FK_SupportMessages_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="SupportMessages" EntitySet="SupportMessages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SupportMessages_Employees" Association="Self.FK_SupportMessages_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="SupportMessages" EntitySet="SupportMessages" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -495,6 +582,17 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ComputerClubDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ChatReadStatus">
+          <Key>
+            <PropertyRef Name="ClientID" />
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="ClientID" Type="Int32" Nullable="false" />
+          <Property Name="EmployeeID" Type="Int32" Nullable="false" />
+          <Property Name="LastReadTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK_ChatReadStatus_Clients" FromRole="ChatReadStatus" ToRole="Clients" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_ChatReadStatus_Employees" FromRole="ChatReadStatus" ToRole="Employees" />
+        </EntityType>
         <EntityType Name="Clients">
           <Key>
             <PropertyRef Name="ClientID" />
@@ -507,11 +605,13 @@
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Balance" Type="Decimal" Precision="10" Scale="2" />
           <Property Name="RegistrationDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ChatReadStatus" Relationship="Self.FK_ChatReadStatus_Clients" FromRole="Clients" ToRole="ChatReadStatus" />
           <NavigationProperty Name="Notifications" Relationship="Self.FK__Notificat__Clien__2B0A656D" FromRole="Clients" ToRole="Notifications" />
           <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__ClientID__619B8048" FromRole="Clients" ToRole="Orders" />
           <NavigationProperty Name="Reservations" Relationship="Self.FK__Reservati__Clien__4F7CD00D" FromRole="Clients" ToRole="Reservations" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Sessions__Client__5535A963" FromRole="Clients" ToRole="Sessions" />
           <NavigationProperty Name="Transactions" Relationship="Self.FK__Transacti__Clien__6B24EA82" FromRole="Clients" ToRole="Transactions" />
+          <NavigationProperty Name="SupportMessages" Relationship="Self.FK_SupportMessages_Clients" FromRole="Clients" ToRole="SupportMessages" />
         </EntityType>
         <EntityType Name="DeviceGames">
           <Key>
@@ -549,9 +649,11 @@
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Password" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="HireDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ChatReadStatus" Relationship="Self.FK_ChatReadStatus_Employees" FromRole="Employees" ToRole="ChatReadStatus" />
           <NavigationProperty Name="Orders" Relationship="Self.FK__Orders__Employee__628FA481" FromRole="Employees" ToRole="Orders" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Sessions__Employ__571DF1D5" FromRole="Employees" ToRole="Sessions" />
           <NavigationProperty Name="Transactions" Relationship="Self.FK__Transacti__Emplo__6C190EBB" FromRole="Employees" ToRole="Transactions" />
+          <NavigationProperty Name="SupportMessages" Relationship="Self.FK_SupportMessages_Employees" FromRole="Employees" ToRole="SupportMessages" />
         </EntityType>
         <EntityType Name="Games">
           <Key>
@@ -653,6 +755,20 @@
           <NavigationProperty Name="Reservations" Relationship="Self.FK__Sessions__Reserv__59063A47" FromRole="Sessions" ToRole="Reservations" />
           <NavigationProperty Name="Transactions" Relationship="Self.FK__Transacti__Sessi__6D0D32F4" FromRole="Sessions" ToRole="Transactions" />
         </EntityType>
+        <EntityType Name="SupportMessages">
+          <Key>
+            <PropertyRef Name="MessageID" />
+          </Key>
+          <Property Name="MessageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientID" Type="Int32" />
+          <Property Name="EmployeeID" Type="Int32" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SentAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsReadByClient" Type="Boolean" Nullable="false" />
+          <Property Name="IsReadByEmployee" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK_SupportMessages_Clients" FromRole="SupportMessages" ToRole="Clients" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_SupportMessages_Employees" FromRole="SupportMessages" ToRole="Employees" />
+        </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
@@ -692,6 +808,30 @@
           <NavigationProperty Name="Reservations" Relationship="Self.FK__Transacti__Reser__6E01572D" FromRole="Transactions" ToRole="Reservations" />
           <NavigationProperty Name="Sessions" Relationship="Self.FK__Transacti__Sessi__6D0D32F4" FromRole="Transactions" ToRole="Sessions" />
         </EntityType>
+        <Association Name="FK_ChatReadStatus_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="ChatReadStatus" Type="Self.ChatReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="ChatReadStatus">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChatReadStatus_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="ChatReadStatus" Type="Self.ChatReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="ChatReadStatus">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Notificat__Clien__2B0A656D">
           <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
           <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
@@ -748,6 +888,18 @@
               <PropertyRef Name="ClientID" />
             </Principal>
             <Dependent Role="Transactions">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SupportMessages_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="0..1" />
+          <End Role="SupportMessages" Type="Self.SupportMessages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="SupportMessages">
               <PropertyRef Name="ClientID" />
             </Dependent>
           </ReferentialConstraint>
@@ -852,6 +1004,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SupportMessages_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="SupportMessages" Type="Self.SupportMessages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="SupportMessages">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__OrderItem__MenuI__6754599E">
           <End Role="MenuItems" Type="Self.MenuItems" Multiplicity="1" />
           <End Role="OrderItems" Type="Self.OrderItems" Multiplicity="*" />
@@ -927,6 +1091,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ChatReadStatus" EntityType="Self.ChatReadStatus" />
           <EntitySet Name="Clients" EntityType="Self.Clients" />
           <EntitySet Name="DeviceGames" EntityType="Self.DeviceGames" />
           <EntitySet Name="Devices" EntityType="Self.Devices" />
@@ -938,9 +1103,18 @@
           <EntitySet Name="Orders" EntityType="Self.Orders" />
           <EntitySet Name="Reservations" EntityType="Self.Reservations" />
           <EntitySet Name="Sessions" EntityType="Self.Sessions" />
+          <EntitySet Name="SupportMessages" EntityType="Self.SupportMessages" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="Tariffs" EntityType="Self.Tariffs" />
           <EntitySet Name="Transactions" EntityType="Self.Transactions" />
+          <AssociationSet Name="FK_ChatReadStatus_Clients" Association="Self.FK_ChatReadStatus_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="ChatReadStatus" EntitySet="ChatReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChatReadStatus_Employees" Association="Self.FK_ChatReadStatus_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="ChatReadStatus" EntitySet="ChatReadStatus" />
+          </AssociationSet>
           <AssociationSet Name="FK__Notificat__Clien__2B0A656D" Association="Self.FK__Notificat__Clien__2B0A656D">
             <End Role="Clients" EntitySet="Clients" />
             <End Role="Notifications" EntitySet="Notifications" />
@@ -960,6 +1134,10 @@
           <AssociationSet Name="FK__Transacti__Clien__6B24EA82" Association="Self.FK__Transacti__Clien__6B24EA82">
             <End Role="Clients" EntitySet="Clients" />
             <End Role="Transactions" EntitySet="Transactions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SupportMessages_Clients" Association="Self.FK_SupportMessages_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="SupportMessages" EntitySet="SupportMessages" />
           </AssociationSet>
           <AssociationSet Name="FK__DeviceGam__Devic__49C3F6B7" Association="Self.FK__DeviceGam__Devic__49C3F6B7">
             <End Role="Devices" EntitySet="Devices" />
@@ -993,6 +1171,10 @@
             <End Role="Employees" EntitySet="Employees" />
             <End Role="Transactions" EntitySet="Transactions" />
           </AssociationSet>
+          <AssociationSet Name="FK_SupportMessages_Employees" Association="Self.FK_SupportMessages_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="SupportMessages" EntitySet="SupportMessages" />
+          </AssociationSet>
           <AssociationSet Name="FK__OrderItem__MenuI__6754599E" Association="Self.FK__OrderItem__MenuI__6754599E">
             <End Role="MenuItems" EntitySet="MenuItems" />
             <End Role="OrderItems" EntitySet="OrderItems" />
@@ -1024,6 +1206,15 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="Хранилище ComputerClubDBModelContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="ChatReadStatus">
+            <EntityTypeMapping TypeName="ComputerClubDBModel.ChatReadStatus">
+              <MappingFragment StoreEntitySet="ChatReadStatus">
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="LastReadTime" ColumnName="LastReadTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Clients">
             <EntityTypeMapping TypeName="ComputerClubDBModel.Clients">
               <MappingFragment StoreEntitySet="Clients">
@@ -1158,6 +1349,19 @@
                 <ScalarProperty Name="IsFrozen" ColumnName="IsFrozen" />
                 <ScalarProperty Name="FreezeStartTime" ColumnName="FreezeStartTime" />
                 <ScalarProperty Name="MaxFreezeMinutes" ColumnName="MaxFreezeMinutes" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SupportMessages">
+            <EntityTypeMapping TypeName="ComputerClubDBModel.SupportMessages">
+              <MappingFragment StoreEntitySet="SupportMessages">
+                <ScalarProperty Name="MessageID" ColumnName="MessageID" />
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="SentAt" ColumnName="SentAt" />
+                <ScalarProperty Name="IsReadByClient" ColumnName="IsReadByClient" />
+                <ScalarProperty Name="IsReadByEmployee" ColumnName="IsReadByEmployee" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

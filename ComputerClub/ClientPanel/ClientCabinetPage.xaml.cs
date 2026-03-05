@@ -1,18 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace ComputerClub.ClientPanel
 {
     public partial class ClientCabinetPage : Page
     {
-        private int? _activeSessionId = null;
+        public ObservableCollection<SupportMessages> Messages { get; } = new ObservableCollection<SupportMessages>();
+        private DispatcherTimer _chatTimer;
+        private int? _activeSessionId;
 
         public ClientCabinetPage()
         {
             InitializeComponent();
+            DataContext = this;
             Loaded += ClientCabinetPage_Loaded;
         }
 
@@ -20,8 +28,223 @@ namespace ComputerClub.ClientPanel
         {
             LoadClientInfo();
             LoadActiveSessionIfExists();
-            SwitchTab("Shop");
-            rbShop.IsChecked = true;
+            LoadDeviceTariff();
+            SwitchChatTariff_Click(btnTariffTab, new RoutedEventArgs());
+            StartChatPolling();
+        }
+
+        private void StartChatPolling()
+        {
+            _chatTimer?.Stop();
+            _chatTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4.5) };
+            _chatTimer.Tick += async (s, ev) => await LoadAllMessagesAsync();
+            _chatTimer.Start();
+            _ = LoadAllMessagesAsync();
+        }
+
+        private async Task LoadAllMessagesAsync()
+        {
+            if (!AppConfig.CurrentClientId.HasValue) return;
+
+            try
+            {
+                List<SupportMessages> allMsgs;
+                bool hasUnreadFromAdmin = false;
+
+                using (var ctx = new Entities())
+                {
+                    allMsgs = ctx.SupportMessages
+                        .Where(m => m.ClientID == AppConfig.CurrentClientId.Value)
+                        .OrderBy(m => m.SentAt)
+                        .ToList();
+
+                    // Обновляем LastReadTime, если чат открыт
+                    if (ChatPanel.Visibility == Visibility.Visible)
+                    {
+                        var readStatus = ctx.ChatReadStatus
+                            .FirstOrDefault(rs => rs.ClientID == AppConfig.CurrentClientId.Value
+                                               && rs.EmployeeID == null);
+
+                        if (readStatus == null)
+                        {
+                            readStatus = new ChatReadStatus
+                            {
+                                ClientID = AppConfig.CurrentClientId.Value,
+                                EmployeeID = null,
+                                LastReadTime = DateTime.UtcNow
+                            };
+                            ctx.ChatReadStatus.Add(readStatus);
+                        }
+                        else
+                        {
+                            readStatus.LastReadTime = DateTime.UtcNow;
+                        }
+
+                        await ctx.SaveChangesAsync();
+
+                        // Помечаем сообщения от админа прочитанными (для галочек)
+                        var unreadFromAdmin = allMsgs.Where(m => m.EmployeeID != null && !m.IsReadByClient).ToList();
+                        if (unreadFromAdmin.Any())
+                        {
+                            foreach (var m in unreadFromAdmin) m.IsReadByClient = true;
+                            await ctx.SaveChangesAsync();
+                        }
+                    }
+
+                    // Считаем непрочитанные от админа
+                    var lastRead = ctx.ChatReadStatus
+                        .FirstOrDefault(rs => rs.ClientID == AppConfig.CurrentClientId.Value
+                                           && rs.EmployeeID == null)?.LastReadTime
+                        ?? DateTime.MinValue;
+
+                    hasUnreadFromAdmin = allMsgs.Any(m => m.EmployeeID != null && m.SentAt > lastRead);
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    Messages.Clear();
+                    foreach (var msg in allMsgs)
+                    {
+                        msg.SentAt = DateTime.SpecifyKind(msg.SentAt, DateTimeKind.Utc).ToLocalTime();
+                        Messages.Add(msg);
+                    }
+
+                    if (ChatPanel.Visibility == Visibility.Visible)
+                        ChatScrollViewer?.ScrollToEnd();
+
+                    // Обновляем badge
+                    UnreadBadge.Visibility = hasUnreadFromAdmin ? Visibility.Visible : Visibility.Collapsed;
+                    if (hasUnreadFromAdmin)
+                    {
+                        // Можно показывать цифру, если сообщений > 1
+                        // UnreadBadgeText.Text = allMsgs.Count(m => m.EmployeeID != null && m.SentAt > lastRead).ToString();
+                        UnreadBadgeText.Text = "!";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка чата: {ex}");
+            }
+        }
+
+        private async void SwitchChatTariff_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string tag)
+            {
+                if (tag == "Chat")
+                {
+                    ChatPanel.Visibility = Visibility.Visible;
+                    TariffPanel.Visibility = Visibility.Collapsed;
+                    btnChatTab.Background = new SolidColorBrush(Colors.White);
+                    btnTariffTab.Background = new SolidColorBrush(Colors.Transparent);
+
+                    await LoadAllMessagesAsync(); // обновляем LastReadTime и индикатор
+                }
+                else
+                {
+                    ChatPanel.Visibility = Visibility.Collapsed;
+                    TariffPanel.Visibility = Visibility.Visible;
+                    btnTariffTab.Background = new SolidColorBrush(Colors.White);
+                    btnChatTab.Background = new SolidColorBrush(Colors.Transparent);
+
+                    LoadDeviceTariff();
+                }
+            }
+        }
+
+        private async void SendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            await SendCurrentMessage();
+        }
+
+        private async void tbMessageInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                e.Handled = true;
+                await SendCurrentMessage();
+            }
+        }
+
+        private async Task SendCurrentMessage()
+        {
+            string text = tbMessageInput.Text?.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+
+            tbMessageInput.Clear();
+
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var msg = new SupportMessages
+                    {
+                        ClientID = AppConfig.CurrentClientId.Value,
+                        Content = text,
+                        SentAt = DateTime.UtcNow,
+                        IsReadByClient = true,
+                        IsReadByEmployee = false
+                    };
+
+                    ctx.SupportMessages.Add(msg);
+                    await ctx.SaveChangesAsync();
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        msg.SentAt = DateTime.SpecifyKind(msg.SentAt, DateTimeKind.Utc).ToLocalTime();
+                        Messages.Add(msg);
+                        if (ChatPanel.Visibility == Visibility.Visible)
+                            ChatScrollViewer?.ScrollToEnd();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Не удалось отправить.\n{ex.Message}");
+            }
+        }
+        private void LoadDeviceTariff()
+        {
+            if (!AppConfig.IsOnSite || !AppConfig.DeviceNumber.HasValue)
+            {
+                tbNoTariff.Text = "Выберите устройство, чтобы увидеть тариф";
+                tbNoTariff.Visibility = Visibility.Visible;
+                TariffInfoPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            try
+            {
+                using (var ctx = new Entities())
+                {
+                    var device = ctx.Devices
+                        .Include("Tariffs")
+                        .FirstOrDefault(d => d.DeviceID == AppConfig.DeviceNumber.Value);
+
+                    if (device != null && device.Tariffs != null)
+                    {
+                        tbTariffName.Text = device.Tariffs.Name ?? "Тариф не указан";
+                        tbTariffDescription.Text = device.Tariffs.Description ?? "Нет описания";
+                        tbTariffPrice.Text = $"Цена: {device.Tariffs.PricePerHour:N0} ₽/час";
+                        tbNoTariff.Visibility = Visibility.Collapsed;
+                        TariffInfoPanel.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        tbNoTariff.Text = "Тариф для этого устройства не найден";
+                        tbNoTariff.Visibility = Visibility.Visible;
+                        TariffInfoPanel.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                tbNoTariff.Text = "Ошибка загрузки тарифа устройства";
+                tbNoTariff.Visibility = Visibility.Visible;
+                TariffInfoPanel.Visibility = Visibility.Collapsed;
+                System.Diagnostics.Debug.WriteLine("Ошибка тарифа: " + ex.Message);
+            }
         }
 
         private void LoadClientInfo()
@@ -79,16 +302,7 @@ namespace ComputerClub.ClientPanel
 
         private void UpdateSessionButtonState()
         {
-            if (AppConfig.IsSessionActive)
-            {
-                btnSessionControl.Content = "Завершить сессию";
-            }
-            else
-            {
-                btnSessionControl.Content = "Начать сессию";
-
-            }
-
+            btnSessionControl.Content = AppConfig.IsSessionActive ? "Завершить сессию" : "Начать сессию";
             btnSessionControl.IsEnabled = AppConfig.IsOnSite && AppConfig.DeviceNumber.HasValue;
         }
 
@@ -116,27 +330,6 @@ namespace ComputerClub.ClientPanel
                 case "Profile":
                     CabinetFrame.Navigate(new CabinetProfilePage());
                     break;
-            }
-        }
-
-        private void SwitchChatTariff_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag != null)
-            {
-                if (btn.Tag.ToString() == "Chat")
-                {
-                    ChatPanel.Visibility = Visibility.Visible;
-                    TariffPanel.Visibility = Visibility.Collapsed;
-                    btnChatTab.Background = new SolidColorBrush(Colors.White);
-                    btnTariffTab.Background = new SolidColorBrush(Colors.Transparent);
-                }
-                else // Tariff
-                {
-                    ChatPanel.Visibility = Visibility.Collapsed;
-                    TariffPanel.Visibility = Visibility.Visible;
-                    btnTariffTab.Background = new SolidColorBrush(Colors.White);
-                    btnChatTab.Background = new SolidColorBrush(Colors.Transparent);
-                }
             }
         }
 
@@ -172,7 +365,6 @@ namespace ComputerClub.ClientPanel
 
             if (AppConfig.IsSessionActive)
             {
-                // Завершаем сессию
                 var result = MessageBox.Show(
                     "Завершить текущую сессию?\nСтоимость будет списана автоматически.",
                     "Завершение сессии",
@@ -194,24 +386,19 @@ namespace ComputerClub.ClientPanel
                             return;
                         }
 
-                        // Запоминаем данные до сохранения (для уведомления)
                         int clientId = session.ClientID;
                         int deviceNumber = AppConfig.DeviceNumber ?? 0;
-
                         session.EndTime = DateTime.Now;
                         ctx.SaveChanges();
 
-                        // Триггер уже должен был списать деньги и обновить статус
-                        // Создаём уведомление о завершении
                         CreateSessionCompletedNotification(ctx, clientId, deviceNumber);
-
                         MessageBox.Show("Сессия завершена. Средства списаны.", "Успех");
                     }
 
                     AppConfig.IsSessionActive = false;
                     _activeSessionId = null;
                     UpdateSessionButtonState();
-                    LoadClientInfo(); // обновляем баланс
+                    LoadClientInfo();
                 }
                 catch (Exception ex)
                 {
@@ -220,7 +407,6 @@ namespace ComputerClub.ClientPanel
             }
             else
             {
-                // Начинаем сессию
                 var result = MessageBox.Show(
                     $"Начать сессию на устройстве №{AppConfig.DeviceNumber} ({AppConfig.DeviceName})?",
                     "Начало сессии",
@@ -248,7 +434,6 @@ namespace ComputerClub.ClientPanel
                         AppConfig.IsSessionActive = true;
 
                         CreateSessionStartedNotification(ctx, AppConfig.CurrentClientId.Value);
-
                         MessageBox.Show("Сессия начата. Приятной игры!", "Успех");
                     }
 
@@ -275,17 +460,14 @@ namespace ComputerClub.ClientPanel
                     IsRead = false,
                     CreatedAt = DateTime.Now
                 });
-
                 ctx.SaveChanges();
             }
             catch (Exception ex)
             {
-                // Не показываем пользователю ошибку уведомления, чтобы не прерывать процесс
                 Console.WriteLine($"Ошибка создания уведомления о завершении сессии: {ex.Message}");
             }
         }
 
-        // Опционально: уведомление о начале сессии
         private void CreateSessionStartedNotification(Entities ctx, int clientId)
         {
             try
@@ -300,7 +482,6 @@ namespace ComputerClub.ClientPanel
                     IsRead = false,
                     CreatedAt = DateTime.Now
                 });
-
                 ctx.SaveChanges();
             }
             catch { /* тихо */ }

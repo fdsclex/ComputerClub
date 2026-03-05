@@ -70,6 +70,12 @@
     <Compile Include="AdminPanel\AdminDashboardPage.xaml.cs">
       <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AdminPanel\SupportChatsPage.xaml.cs">
+      <DependentUpon>SupportChatsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChatReadStatus.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Clients.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -186,6 +192,9 @@
     <Compile Include="Sessions.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="SupportMessages.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="sysdiagrams.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -196,6 +205,10 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Page Include="AdminPanel\AdminDashboardPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminPanel\SupportChatsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
