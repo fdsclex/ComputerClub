@@ -154,7 +154,6 @@ namespace ComputerClub.Navigation
         private void SendResetCode_Click(object sender, RoutedEventArgs e)
         {
             string phone = tbResetPhone.Text.Trim();
-
             if (string.IsNullOrWhiteSpace(phone) || phone.Length < 12)
             {
                 MessageBox.Show("Введите корректный номер телефона", "Ошибка");
@@ -176,13 +175,14 @@ namespace ComputerClub.Navigation
                     resetCode = rnd.Next(100000, 999999).ToString();
                     codeSentTime = DateTime.Now;
 
-                    // Тестовый вывод кода
-                    MessageBox.Show($"Ваш код подтверждения (тестовый режим): {resetCode}\nВ реальном проекте придёт SMS.",
-                                    "Код отправлен");
+                    // Тестовый вывод кода (в реальном проекте → SMS)
+                    MessageBox.Show($"Ваш код подтверждения: {resetCode}", "Код отправлен");
 
-                    resetCodePanel.Visibility = Visibility.Visible;
+                    // Переключаем видимость блоков
+                    phoneInputBlock.Visibility = Visibility.Collapsed;
+                    codeAndPasswordBlock.Visibility = Visibility.Visible;
+
                     tbResetCode.Focus();
-
                     tbResetTimer.Text = $"Код действителен {CODE_VALID_MINUTES} минут";
                 }
             }
@@ -237,13 +237,26 @@ namespace ComputerClub.Navigation
 
                     MessageBox.Show("Пароль успешно изменён!\nТеперь можете войти с новым паролем.", "Успех");
 
-                    // Возврат к форме логина
+                    // Полный возврат к логину
                     resetPanel.Visibility = Visibility.Collapsed;
                     loginPanel.Visibility = Visibility.Visible;
-                    tbPhone.Text = tbResetPhone.Text;
+
+                    tbPhone.Text = tbResetPhone.Text.Trim();
                     pbPassword.Password = "";
                     tbPasswordVisible.Text = "";
                     tbPhone.Focus();
+                    tbPhone.Select(tbPhone.Text.Length, 0);
+
+                    // Сброс полей восстановления
+                    tbResetPhone.Text = "+7";
+                    tbResetCode.Text = "";
+                    pbNewPassword.Password = "";
+                    tbResetTimer.Text = "";
+                    resetCode = "";
+
+                    // Возвращаем начальное состояние панели восстановления
+                    phoneInputBlock.Visibility = Visibility.Visible;
+                    codeAndPasswordBlock.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -251,6 +264,29 @@ namespace ComputerClub.Navigation
                 MessageBox.Show($"Ошибка изменения пароля:\n{ex.Message}", "Ошибка");
             }
         }
+
+        private void CancelReset_Click(object sender, RoutedEventArgs e)
+        {
+            // Сбрасываем поля
+            tbResetPhone.Text = "+7";
+            tbResetCode.Text = "";
+            pbNewPassword.Password = "";
+            tbResetTimer.Text = "";
+            resetCode = "";
+
+            // Возвращаем начальный вид панели восстановления
+            phoneInputBlock.Visibility = Visibility.Visible;
+            codeAndPasswordBlock.Visibility = Visibility.Collapsed;
+
+            // Скрываем восстановление → показываем логин
+            resetPanel.Visibility = Visibility.Collapsed;
+            loginPanel.Visibility = Visibility.Visible;
+
+            tbPhone.Focus();
+            tbPhone.Select(tbPhone.Text.Length, 0);
+        }
+
+        
         private void GenerateCaptcha()
         {
             captchaCanvas.Children.Clear();
