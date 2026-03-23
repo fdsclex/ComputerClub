@@ -34,9 +34,33 @@
                              Margin="0,0,0,8" Click="NavButton_Click" Tag="ClientsPage"/>
                 <RadioButton x:Name="rbReports" Content="Отчёты и финансы" Style="{StaticResource NavRadioButton}"
                              Margin="0,0,0,8" Click="NavButton_Click" Tag="ReportsPage"/>
-                <RadioButton x:Name="rbChats" Content="Чаты"
-                             Style="{StaticResource NavRadioButton}"
-                             Margin="0,0,0,40" Click="NavButton_Click" Tag="SupportChatsPage"/>          
+                <RadioButton x:Name="rbChats" Style="{StaticResource NavRadioButton}"
+             Margin="0,0,0,40" Click="NavButton_Click" Tag="SupportChatsPage">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Чаты" VerticalAlignment="Center"/>
+
+                        <Border Grid.Column="2"
+                Background="#E53935"
+                CornerRadius="10"
+                MinWidth="20" MinHeight="20"
+                Padding="6,2"
+                Margin="12,0,0,0"
+                Visibility="{Binding ChatsBadgeVisibility, RelativeSource={RelativeSource AncestorType=Page}}"
+                VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TotalUnreadChats, RelativeSource={RelativeSource AncestorType=Page}}"
+                       FontSize="12"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       TextAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </RadioButton>
                 <!-- Выход внизу -->
                 <Button Content="Выйти" Style="{StaticResource FinishSessionButton}"
                          Click="Logout_Click"/>

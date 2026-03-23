@@ -117,7 +117,7 @@
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource StatusTextBlock}"/>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTemplateColumn Header="Действия" Width="250">
+                        <DataGridTemplateColumn Header="Действия" Width="300">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

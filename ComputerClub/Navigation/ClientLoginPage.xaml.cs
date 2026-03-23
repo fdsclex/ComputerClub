@@ -191,11 +191,39 @@ namespace ComputerClub.Navigation
                 MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка");
             }
         }
+        private void ToggleNewPassword_Click(object sender, RoutedEventArgs e)
+        {
+            bool isVisibleNow = pbNewPassword.Visibility == Visibility.Visible;
 
+            if (isVisibleNow)
+            {
+                // Показываем текст → меняем на крестик
+                tbNewPasswordVisible.Text = pbNewPassword.Password;
+                pbNewPassword.Visibility = Visibility.Collapsed;
+                tbNewPasswordVisible.Visibility = Visibility.Visible;
+                tbNewPasswordVisible.Focus();
+                tbNewPasswordVisible.CaretIndex = tbNewPasswordVisible.Text.Length;
+
+                btnToggleNewPassword.Content = "✗";           // ← меняем иконку
+            }
+            else
+            {
+                // Скрываем текст → возвращаем глаз
+                pbNewPassword.Password = tbNewPasswordVisible.Text;
+                tbNewPasswordVisible.Visibility = Visibility.Collapsed;
+                pbNewPassword.Visibility = Visibility.Visible;
+                pbNewPassword.Focus();
+
+                btnToggleNewPassword.Content = "👁";           // ← возвращаем глаз
+            }
+        }
         private void ChangePassword_Click(object sender, RoutedEventArgs e)
         {
-            string codeInput = tbResetCode.Text.Trim();
-            string newPassword = pbNewPassword.Password;
+            string codeInput = tbResetCode.Text.Replace(" ", "").Trim();
+            // ← здесь главное изменение
+            string newPassword = pbNewPassword.Visibility == Visibility.Visible
+                ? pbNewPassword.Password
+                : tbNewPasswordVisible.Text;
 
             if (codeInput.Length != 6 || !int.TryParse(codeInput, out _))
             {
@@ -264,7 +292,51 @@ namespace ComputerClub.Navigation
                 MessageBox.Show($"Ошибка изменения пароля:\n{ex.Message}", "Ошибка");
             }
         }
+        private void ResetCode_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (!char.IsDigit(e.Text[0]))
+            {
+                e.Handled = true;
+                return;
+            }
+        }
 
+        private void ResetCode_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb && tb == tbResetCode)
+            {
+                string text = new string(tb.Text.Where(char.IsDigit).ToArray());
+
+                // Ограничиваем до 6 цифр
+                if (text.Length > 6) text = text.Substring(0, 6);
+
+                string formatted = text;
+                if (text.Length > 3)
+                {
+                    formatted = text.Substring(0, 3) + " " + text.Substring(3);
+                }
+
+                if (tb.Text != formatted)
+                {
+                    int caret = tb.CaretIndex;
+                    tb.Text = formatted;
+                    tb.CaretIndex = caret > 3 ? caret + 1 : caret;  // +1 из-за пробела
+                }
+            }
+        }
+
+        private void ResetCode_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && string.IsNullOrEmpty(tb.Text))
+            {
+                tb.Text = "";
+            }
+        }
+
+        private void ResetCode_LostFocus(object sender, RoutedEventArgs e)
+        {
+            // Можно оставить пустым или добавить подсказку, если нужно
+        }
         private void CancelReset_Click(object sender, RoutedEventArgs e)
         {
             // Сбрасываем поля
@@ -285,8 +357,19 @@ namespace ComputerClub.Navigation
             tbPhone.Focus();
             tbPhone.Select(tbPhone.Text.Length, 0);
         }
+        public static readonly DependencyProperty IsNewPasswordVisibleProperty =
+    DependencyProperty.Register(
+        nameof(IsNewPasswordVisible),
+        typeof(bool),
+        typeof(ClientLoginPage),
+        new PropertyMetadata(false));
 
-        
+        public bool IsNewPasswordVisible
+        {
+            get => (bool)GetValue(IsNewPasswordVisibleProperty);
+            set => SetValue(IsNewPasswordVisibleProperty, value);
+        }
+
         private void GenerateCaptcha()
         {
             captchaCanvas.Children.Clear();
